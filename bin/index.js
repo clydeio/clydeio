@@ -67,7 +67,8 @@ function onListening() {
  * Module dependencies.
  */
 var http = require("http");
-var clyde = require("./app/clyde.js");
+var config = require("../config.json");
+var clyde = require("../lib/clyde.js");
 
 
 /**
@@ -77,9 +78,10 @@ var port = normalizePort(process.env.PORT || "3000");
 
 
 /**
- * Create HTTP server.
+ * Create proxy HTTP server.
  */
-var server = http.createServer(clyde);
+var clydeProxy = clyde.createProxyServer(config);
+var server = http.createServer(clydeProxy);
 
 
 /**

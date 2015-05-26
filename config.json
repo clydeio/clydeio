@@ -1,0 +1,21 @@
+{
+  "plugins" : [
+    {
+      "name" : "logger",
+      "path" : "./plugins/logger",
+      "config" : {
+        "file" : "access.log",
+        "rotate" : false
+      }
+    },
+    {
+      "name" : "lo2222",
+      "path" : "./plugins/logger",
+      "config" : {
+        "file" : "access.log",
+        "rotate" : false
+      }
+    }
+
+  ]
+}

@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "node ./index.js"
+    "start": "node ./bin/index.js"
   },
   "dependencies": {
     "connect": "^3.3.5",
