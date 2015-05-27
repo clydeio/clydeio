@@ -4,12 +4,9 @@
 
 "use strict";
 
-/**
- * Module dependencies.
- */
-var http = require("http");
-var config = require("../config.json");
-var clyde = require("../lib/clyde.js");
+var http = require("http"),
+    config = require("../config.json"),
+    clyde = require("../lib/clyde.js");
 
 
 /**
@@ -97,3 +94,16 @@ function onListening() {
     : "port " + addr.port;
   console.log("Clyde is listening on " + bind);
 }
+
+
+
+////////////////////////////////////////////////////////////////////////
+var prov1 = http
+  .createServer(function(req, res) {
+    res.write("PROVIDER 1");
+    res.end();
+
+  })
+  .listen(4000);
+
+
