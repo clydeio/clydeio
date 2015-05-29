@@ -1,8 +1,10 @@
 {
-  "plugins" : [
+
+  "_prefilters" : "Global filters applied before any route",
+  "prefilters" : [
     {
       "name" : "logger",
-      "path" : "./plugins/logger",
+      "path" : "./filters/logger",
       "config" : {
         "file" : "access.log",
         "rotate" : false
@@ -10,11 +12,19 @@
     }
   ],
 
+  "_providers" : "Route to our private APIs",
   "providers" : [
     {
       "context" : "/prov1",
+      "name" : "provider1",
       "target" : "http://localhost:4000/",
-      "plugins" : []
+      "filters" : []
     }
+  ],
+
+  "_postfilters" : "Global filters applied after any route",
+  "postfilters" : [
+
   ]
+
 }
