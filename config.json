@@ -19,12 +19,25 @@
       "name" : "provider1",
       "target" : "http://localhost:4000/",
       "filters" : []
+    },
+    {
+      "context" : "/prov2",
+      "name" : "provider2",
+      "target" : "http://localhost:5000/",
+      "filters" : []
     }
   ],
 
   "_postfilters" : "Global filters applied after any route",
   "postfilters" : [
-
+    {
+      "name" : "postLogger",
+      "path" : "./filters/logger",
+      "config" : {
+        "file" : "access.log",
+        "rotate" : false
+      }
+    }
   ]
 
 }

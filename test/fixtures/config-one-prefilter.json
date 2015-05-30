@@ -1,0 +1,19 @@
+{
+  "prefilters" : [
+    {
+      "name" : "test filter",
+      "path" : "./stubs/filter.js",
+      "config" : {}
+    }
+  ],
+
+  "providers" : [
+    {
+      "context" : "context",
+      "name" : "name",
+      "target" : "target",
+      "filters" : []
+    }
+  ]
+
+}

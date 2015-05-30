@@ -1,0 +1,12 @@
+{
+
+  "providers" : [
+    {
+      "context" : "context",
+      "name" : "name",
+      "target" : "target",
+      "filters" : []
+    }
+  ]
+  
+}

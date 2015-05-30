@@ -1,0 +1,20 @@
+{
+
+  "providers" : [
+    {
+      "context" : "context",
+      "name" : "name",
+      "target" : "target",
+      "filters" : []
+    }
+  ],
+
+  "postfilters" : [
+    {
+      "name" : "test filter",
+      "path" : "./stubs/filter.js",
+      "config" : {}
+    }
+  ]
+
+}

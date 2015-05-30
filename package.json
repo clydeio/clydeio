@@ -3,7 +3,8 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "node ./bin/index.js"
+    "start": "node ./bin/index.js",
+    "test": "./node_modules/mocha/bin/mocha"
   },
   "dependencies": {
     "bunyan": "^1.3.5",
@@ -11,6 +12,7 @@
     "http-proxy": "^1.11.1"
   },
   "devDependencies": {
+    "chai": "^2.3.0",
     "gulp": "~3.8.10",
     "gulp-eslint": "^0.12.0",
     "gulp-nodemon": "~2.0.2",

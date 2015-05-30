@@ -1,0 +1,19 @@
+{
+  "_comment" : "Invalid prefilter without required 'name' property",
+  "prefilters" : [
+    {
+      "path" : "path to filter source",
+      "config" : {}
+    }
+  ],
+
+  "providers" : [
+    {
+      "context" : "context",
+      "name" : "name",
+      "target" : "target",
+      "filters" : []
+    }
+  ]
+
+}
