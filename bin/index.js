@@ -100,7 +100,7 @@ function onListening() {
 ////////////////////////////////////////////////////////////////////////
 var prov1 = http
   .createServer(function(req, res) {
-    console.log("provider 1 called");
+    console.log("provider 1 called on port 4000");
     res.write("PROVIDER 1");
     res.end();
   })

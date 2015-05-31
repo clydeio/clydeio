@@ -2,7 +2,7 @@
 
 module.exports.init = function(name, config) {
   return function(req, res, next) {
-    console.log("The logger plugin");
+    console.log("The logger plugin ", req.url);
     next();
   };
 };

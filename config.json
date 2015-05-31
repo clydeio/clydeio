@@ -23,7 +23,7 @@
     {
       "context" : "/prov2",
       "name" : "provider2",
-      "target" : "http://localhost:5000/",
+      "target" : "http://localhost:5000",
       "filters" : []
     }
   ],
