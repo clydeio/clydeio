@@ -70,6 +70,11 @@ describe("Configuration", function(){
 
     var config = configuration.load(configJS);
     expect(Object.keys(config.providers).length).to.be.equal(1);
+    expect(config.context).to.be.equal(configJS.context);
+    expect(config.name).to.be.equal(configJS.name);
+    expect(config.target).to.be.equal(configJS.target);
+    expect(config.prefilters).to.have.length(0);
+    expect(config.postfilters).to.have.length(0);
   });
 
 

@@ -1,6 +1,6 @@
 {
 
-  "_prefilters" : "Global filters applied before any route",
+  "_prefilters" : "Global filters applied before any provider",
   "prefilters" : [
     {
       "name" : "logger",
@@ -24,11 +24,15 @@
       "context" : "/prov2",
       "name" : "provider2",
       "target" : "http://localhost:5000",
-      "filters" : []
+
+      "_prefilters" : "Local filters applied before proxy to provider",
+      "prefilters" : [],
+      "_postfilters" : "Local filters applied after proxy to provider",
+      "postfilters" : []
     }
   ],
 
-  "_postfilters" : "Global filters applied after any route",
+  "_postfilters" : "Global filters applied after any provider",
   "postfilters" : [
     {
       "name" : "postLogger",

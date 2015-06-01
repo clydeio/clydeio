@@ -5,7 +5,8 @@
     {
       "name" : "provider name",
       "target" : "target URL",
-      "filters" : []
+      "prefilters" : [],
+      "postfilters" : []
     }
   ]
 

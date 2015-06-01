@@ -12,7 +12,8 @@
       "context" : "context",
       "name" : "name",
       "target" : "target",
-      "filters" : []
+      "prefilters" : [],
+      "postfilters" : []
     }
   ]
 
