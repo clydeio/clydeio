@@ -14,6 +14,10 @@ Clyde can be used to makes accessible only some methods of the private API.
 
 ### Filters
 
+A filter is any kind middleware, following the [connect](https://github.com/senchalabs/connect) language, that receives the `request`, `response` and `next` parameters.
+
+By convention, all modules that implements filters, must provide an `init(name , config)` method, responsible to return the filter middleware. The received parameters are passed from the configuration JSON file and are the name and configuration of the filter.
+
 * HMAC security.
 * API KEY security.
 * Rate limit.
