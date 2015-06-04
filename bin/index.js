@@ -5,9 +5,7 @@
 "use strict";
 
 var http = require("http"),
-    path = require("path"),
-    config = require("../config"),
-    clyde = require("../lib/clyde");
+    path = require("path");
 
 /**
  * Parse command line arguments
@@ -26,7 +24,7 @@ var argv = require("yargs")
   .argv;
 
 /**
- * Set options
+ * Set global options and initialize logger
  */
 var options = {
   logfile: argv.logfile || "clyde.log",
@@ -34,9 +32,11 @@ var options = {
   port: argv.port || "8080"
 };
 
+console.log(options);
 
 var log = require("../lib/log").log(options);
-
+var config = require("../config"),
+    clyde = require("../lib/clyde");
 
 /**
  * Create proxy HTTP server.
