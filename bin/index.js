@@ -5,14 +5,37 @@
 "use strict";
 
 var http = require("http"),
-    config = require("../config.json"),
-    clyde = require("../lib/clyde.js");
-
+    path = require("path"),
+    config = require("../config"),
+    clyde = require("../lib/clyde");
 
 /**
- * Get port from environment and store in Express.
+ * Parse command line arguments
  */
-var port = normalizePort(process.env.PORT || "3000");
+var argv = require("yargs")
+  .usage("Usage: $0 [options]")
+  .example("$0 --log info", "Start clyde with log messages on 'info' level")
+  .describe("logfile", "Path to the log file. Default 'clyde.log'.")
+  .nargs('logfile', 1)
+  .describe("loglevel", "Level used for clyde log messages. Default 'info'.")
+  .nargs('loglevel', 1)
+  .describe("port", "Port where clyde will listen. Default 8080.")
+  .nargs('port', 1)
+  .help("help")
+  .showHelpOnFail(false, "Specify --help for available options")
+  .argv;
+
+/**
+ * Set options
+ */
+var options = {
+  logfile: argv.logfile || "clyde.log",
+  loglevel: argv.loglevel || "info",
+  port: argv.port || "8080"
+};
+
+
+var log = require("../lib/log").log(options);
 
 
 /**
@@ -25,6 +48,7 @@ var server = http.createServer(clydeProxy);
 /**
  * Listen on provided port, on all network interfaces.
  */
+var port = normalizePort(options.port);
 server.listen(port);
 server.on("error", onError);
 server.on("listening", onListening);
@@ -70,11 +94,11 @@ function onError(error) {
   // handle specific listen errors with friendly messages
   switch (error.code) {
     case "EACCES":
-      console.error(bind + " requires elevated privileges");
+      log.error(bind + " requires elevated privileges");
       process.exit(1);
       break;
     case "EADDRINUSE":
-      console.error(bind + " is already in use");
+      log.error(bind + " is already in use");
       process.exit(1);
       break;
     default:
@@ -92,7 +116,7 @@ function onListening() {
   var bind = typeof addr === "string"
     ? "pipe " + addr
     : "port " + addr.port;
-  console.log("Clyde is listening on " + bind);
+  log.info("Clyde is listening on " + bind);
 }
 
 

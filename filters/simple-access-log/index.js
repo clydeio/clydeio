@@ -7,11 +7,19 @@ var morgan = require("morgan");
 
 
 /**
- * Log implementation based on morgan. See: https://github.com/expressjs/morgan#log-file-rotation
+ * Simple access log implementation based on morgan.
+ *
+ * @public
+ * @param  {String} name Name of the filter
+ * @param  {object} config JavaScript object with filterconfiguration
+ * @return {middleware} Middleware function implementing the filter.
  */
 module.exports.init = function(name, config) {
 
-  // TODO - Check for valid configuration !!!.
+  // Check for configuration parameters
+  if(!config || !config.directory || !config.file) {
+    throw new Error("'simple-access-logger': Invalid filter parameters !!! Directory and file name are required. ");  
+  }
 
   // Ensure log directory exists
   mkdirp.sync(config.directory);

@@ -4,7 +4,7 @@
   "prefilters" : [
     {
       "name" : "logger",
-      "path" : "./filters/access-log-morgan",
+      "path" : "./filters/simple-access-log",
       "config" : {
         "directory" : "./tmp/log",
         "file" : "access-pre-%DATE%.log"
@@ -36,7 +36,7 @@
   "postfilters" : [
     {
       "name" : "postLogger",
-      "path" : "./filters/access-log-morgan",
+      "path" : "./filters/simple-access-log",
       "config" : {
         "directory" : "./tmp/log",
         "file" : "access-post-%DATE%.log"
