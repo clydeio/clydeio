@@ -12,13 +12,13 @@ var morgan = require("morgan");
  * @public
  * @param  {String} name Name of the filter
  * @param  {object} config JavaScript object with filterconfiguration
- * @return {middleware} Middleware function implementing the filter.
+ * @returns {middleware} Middleware function implementing the filter.
  */
 module.exports.init = function(name, config) {
 
   // Check for configuration parameters
-  if(!config || !config.directory || !config.file) {
-    throw new Error("'simple-access-logger': Invalid filter parameters !!! Directory and file name are required. ");  
+  if (!config || !config.directory || !config.file) {
+    throw new Error("'simple-access-logger': Invalid filter parameters !!! Directory and file name are required.");
   }
 
   // Ensure log directory exists
@@ -27,10 +27,10 @@ module.exports.init = function(name, config) {
   // create a rotating write stream
   var accessLogStream = FileStreamRotator.getStream({
     filename: path.join(config.directory, config.file),
-    frequency: 'daily',
+    frequency: "daily",
     verbose: false,
-    date_format: "YYYY-MM-DD"
+    date_format: "YYYY-MM-DD" // eslint-disable-line camelcase
   });
 
-  return morgan('combined', {stream: accessLogStream});
+  return morgan("combined", {stream: accessLogStream});
 };

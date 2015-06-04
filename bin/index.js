@@ -5,7 +5,6 @@
 "use strict";
 
 var http = require("http"),
-    path = require("path"),
     options = require("../lib/cli-options"),
     log = require("../lib/log"),
     config = require("../config"),
@@ -91,17 +90,3 @@ function onListening() {
     : "port " + addr.port;
   log.info("Clyde is listening on " + bind);
 }
-
-
-
-////////////////////////////////////////////////////////////////////////
-// TODO - Remove this, only for bad testing. Move this to tests.
-var prov1 = http
-  .createServer(function(req, res) {
-    console.log("provider 1 called on port 4000");
-    res.write("PROVIDER 1");
-    res.end();
-  })
-  .listen(4000);
-
-

@@ -1,11 +1,12 @@
- "use strict";
+/* eslint no-unused-vars:0 */
+"use strict";
 
 var expect = require("chai").expect;
 var configuration = require("../lib/configuration");
 var InvalidConfiguration = require("../lib/errors/invalid-configuration");
 
- 
-describe("Configuration", function(){  
+
+describe("Configuration", function() {
 
   before(function() {
     configuration.base(__dirname);
@@ -13,7 +14,7 @@ describe("Configuration", function(){
 
   it("should return error because invalid configuration object", function() {
     try {
-      var config = configuration.load("not a config object");  
+      var config = configuration.load("not a config object");
     } catch(err) {
       expect(err).to.be.instanceof(InvalidConfiguration);
       expect(err.message).to.be.equal(InvalidConfiguration.EMPTY_MESSAGE);
