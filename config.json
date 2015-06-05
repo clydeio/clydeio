@@ -9,6 +9,16 @@
         "directory" : "./tmp/log",
         "file" : "access-pre-%DATE%.log"
       }
+    },
+    {
+      "name" : "basic-auth",
+      "path" : "./filters/simple-basic-auth",
+      "config" : {
+        "realm" : "clyde",
+        "consumers" : {
+          "userA" : "passA"
+        }
+      }
     }
   ],
 

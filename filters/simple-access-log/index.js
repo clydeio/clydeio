@@ -7,11 +7,18 @@ var morgan = require("morgan");
 
 
 /**
- * Simple access log implementation based on morgan.
+ * Simple access log implementation based on morgan. Allowed configuration
+ * properties:
+ *
+ * @example
+ * {
+ *   "directory" : "./tmp/log",
+ *   "file" : "access-%DATE%.log"
+ * }
  *
  * @public
  * @param  {String} name Name of the filter
- * @param  {object} config JavaScript object with filterconfiguration
+ * @param  {object} config JavaScript object with filter configuration
  * @returns {middleware} Middleware function implementing the filter.
  */
 module.exports.init = function(name, config) {
@@ -24,7 +31,8 @@ module.exports.init = function(name, config) {
   // Ensure log directory exists
   mkdirp.sync(config.directory);
 
-  // create a rotating write stream
+  // Create a rotating write stream
+  // TODO - Add frequency and date_format parameters to configuration.
   var accessLogStream = FileStreamRotator.getStream({
     filename: path.join(config.directory, config.file),
     frequency: "daily",
