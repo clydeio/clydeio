@@ -55,9 +55,6 @@ module.exports.init = function(name, config) {
   // Set the middleware chain
   middleware.use(passport.initialize());
   middleware.use(passport.authenticate("basic", {session: false}));
-  middleware.use(function(req, res, next) {
-    next();
-  });
   
   return middleware;
 }
