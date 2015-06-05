@@ -2,6 +2,8 @@
 
 At this moment clyde is simple a concept. It is unstable and in heavy development to implement a first core version.
 
+![Clyde the orangutan](http://www.wweek.com/portland/imgs/media.images/18764/movies_everywhich.widea.jpg)
+
 # Clyde
 
 Based on [Kong](http://getkong.org/) and the requirements to protect a private API I started Clyde.
