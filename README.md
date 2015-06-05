@@ -1,9 +1,11 @@
+# CAUTION !!!
+
+At this moment clyde is simple a concept. It is unstable and in heavy development to implement a first core version.
+
 # Clyde
-Another famous ape
 
-## History
+Based on [Kong](http://getkong.org/) and the requirements to protect a private API I started Clyde.
 
-Based on [Kong](http://getkong.org/) and the requirement to protect a private API I started Clyde.
 I choose Clyde name because it is, like Kong, the name of one of the most famous movie apes.
 
 ## Goals
