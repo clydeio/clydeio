@@ -2,11 +2,11 @@
 
 var connect = require("connect");
 var passport = require("passport");
-var BasicStrategy = require("passport-http").BasicStrategy;
+var DigestStrategy = require("passport-http").DigestStrategy;
 
 
 /**
- * Simple basic authentication implementation based on passport-http.
+ * Simple digest authentication implementation based on passport-http.
  * Allowed configuration properties:
  *
  * @example
@@ -29,23 +29,23 @@ module.exports.init = function(name, config) {
 
   // Check for configuration parameters
   if (!config || !config.consumers || Object.keys(config.consumers).length === 0) {
-    throw new Error("'simple-basic-auth': Invalid filter parameters !!! At least one consumer must be specified");
+    throw new Error("'simple-digest-auth': Invalid filter parameters !!! At least one consumer must be specified");
   }
 
   var middleware = connect();
 
-  // Use basic strategy to authenticate users
-  passport.use(new BasicStrategy({
+  // Use digest strategy to authenticate users
+  passport.use(new DigestStrategy({
       realm: config.realm || "clyde"
     },
-    function(userid, password, done) {
-      // Get password for the given userid from the consumers configuration
-      var consumerPassword = config.consumers[userid];
-      if (password === consumerPassword) {
+    function(username, done) {
+      // Get password for the given username from the consumers configuration
+      var consumerPassword = config.consumers[username];
+      if (consumerPassword) {
         return done(null, {
-          username: userid,
-          password: password
-        });
+          username: username,
+          password: consumerPassword
+        }, consumerPassword);
       }
 
       return done(null, false);
@@ -54,7 +54,7 @@ module.exports.init = function(name, config) {
 
   // Set the middleware chain
   middleware.use(passport.initialize());
-  middleware.use(passport.authenticate("basic", {session: false}));
+  middleware.use(passport.authenticate("digest", {session: false}));
 
   return middleware;
 };

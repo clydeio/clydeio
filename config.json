@@ -11,8 +11,8 @@
       }
     },
     {
-      "name" : "basic-auth",
-      "path" : "./filters/simple-basic-auth",
+      "name" : "digest-auth",
+      "path" : "./filters/simple-digest-auth",
       "config" : {
         "realm" : "clyde",
         "consumers" : {
