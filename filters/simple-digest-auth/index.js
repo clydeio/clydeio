@@ -54,7 +54,7 @@ module.exports.init = function(name, config) {
 
   // Set the middleware chain
   middleware.use(passport.initialize());
-  middleware.use(passport.authenticate("digest", {session: false}));
+  middleware.use(passport.authenticate("digest", {session: false, failWithError: true}));
 
   return middleware;
 };
