@@ -27,8 +27,7 @@
     {
       "context" : "/prov1",
       "name" : "provider1",
-      "target" : "http://localhost:4000/",
-      "filters" : []
+      "target" : "http://localhost:8080"
     },
     {
       "context" : "/prov2",
