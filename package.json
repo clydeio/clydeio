@@ -11,6 +11,7 @@
     "connect": "^3.3.5",
     "file-stream-rotator": "0.0.6",
     "http-proxy": "^1.11.1",
+    "limiter": "^1.0.5",
     "mkdirp": "^0.5.1",
     "morgan": "^1.5.3",
     "passport": "^0.2.2",
