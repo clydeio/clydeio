@@ -1,9 +1,15 @@
 "use strict";
 
-var RateLimiter = require('limiter').RateLimiter;
+var RateLimiter = require("limiter").RateLimiter;
 var util = require("util");
 
 
+/**
+ * RateLimitExceeded error.
+ *
+ * @param {String} description Extended description
+ * @returns {void}
+ */
 function RateLimitExceeded(description) {
   Error.captureStackTrace(this, this.constructor);
   this.status = 421;
@@ -15,39 +21,245 @@ function RateLimitExceeded(description) {
 }
 util.inherits(RateLimitExceeded, Error);
 
+RateLimitExceeded.GLOBAL_LIMIT_EXCEEDED = "Global rate limit exceeded.";
+RateLimitExceeded.PROVIDER_LIMIT_EXCEEDED = "Provider rate limit exceeded.";
+RateLimitExceeded.CONSUMER_LIMIT_EXCEEDED = "Consumer rate limit exceeded.";
+RateLimitExceeded.PROVIDER_CONSUMER_LIMIT_EXCEEDED = "Consumer quota on the provider exceeded.";
+
 
 /**
- * Simple rate limit implementation. Limits can be applied to a provider or a
- * provider's operation and for all or a given consumer.
+ * Global rate limiter.
+ *
+ * @type {Object}
+ */
+var globalLimiter;
+/**
+ * Stores the limiter for each provider and the concrete limiter of each
+ * provider's consumer:
+ *
+ * {
+ *   providerA: {
+ *     global: [provider limiter],
+ *     consumers: {
+ *       userA: [userA limiter],
+ *       userB: [userB limiter],
+ *       ...
+ *     }
+ *   }
+ * }
+ *
+ * @type {Object}
+ */
+var providersLimiters = {};
+/**
+ * Stores the limiter of each consumer, when the limit is applied to the
+ * consumer no matter which provider queries:
+ *
+ * {
+ *   userA: [userA limiter],
+ *   userB: [userB limiter],
+ *   ...
+ * }
+ *
+ * @type {Object}
+ */
+var consumersLimiters = {};
+
+/**
+ * Initialize limiters from configuration.
+ *
+ * @param  {Object} config Configuration
+ * @returns {void}
+ */
+function initializeLimiters(config) {
+
+  function parseGlobal(cfg) {
+    var limiter;
+    if (cfg.global) {
+      limiter = new RateLimiter(cfg.global.tokens, cfg.global.interval);
+    }
+    return limiter;
+  }
+
+  function parseConsumers(cfg) {
+    var prop, limitConfig, limiters = {};
+    if (cfg.consumers) {
+      for (prop in cfg.consumers) {
+        limitConfig = cfg.consumers[prop];
+        limiters[prop] = new RateLimiter(limitConfig.tokens, limitConfig.interval);
+      }
+    }
+    return limiters;
+  }
+
+  function parseProviders(cfg) {
+    var prop, limitConfig, limiters = {};
+    if (cfg.providers) {
+      for (prop in cfg.providers) {
+        limitConfig = cfg.providers[prop];
+        limiters[prop] = {};
+
+        if (limitConfig.global) {
+          limiters[prop].global = parseGlobal(limitConfig);
+        }
+
+        if (limitConfig.consumers) {
+          limiters[prop].consumers = parseConsumers(limitConfig.consumers);
+        }
+      }
+    }
+    return limiters;
+  }
+
+  // Parse configuration
+  globalLimiter = parseGlobal(config);
+  consumersLimiters = parseConsumers(config);
+  providersLimiters = parseProviders(config);
+}
+
+
+/**
+ * Apply global rate limits.
+ *
+ * @param  {Function} cb Callback.
+ * @returns {void}
+ */
+function applyGlobalLimit(cb) {
+  if (!globalLimiter) {
+    cb();
+  }
+
+  globalLimiter.removeTokens(1, function(err, remainingRequests) {
+    if (err || remainingRequests === -1) {
+      // Throw error rate limit exceeded
+      cb(new RateLimitExceeded(RateLimitExceeded.GLOBAL_LIMIT_EXCEEDED));
+    }
+    cb();
+  }, true);
+}
+
+
+/**
+ * Apply limits on consumers.
+ *
+ * @param  {String}   consumerId Consumer ID
+ * @param  {Function} cb       Callback
+ * @returns {void}
+ */
+function applyConsumerLimit(consumerId, cb) {
+  if (!consumerId) {
+    cb();
+  }
+
+  var limiter = consumersLimiters[consumerId.userid];
+  if (!limiter) {
+    cb();
+  }
+
+  limiter.removeTokens(1, function(err, remainingRequests) {
+    if (err || remainingRequests === -1) {
+      // Throw error rate limit exceeded
+      cb(new RateLimitExceeded(RateLimitExceeded.CONSUMER_LIMIT_EXCEEDED));
+    }
+    cb();
+  }, true);
+}
+
+
+/**
+ * Apply limits on providers.
+ *
+ * @param  {String}   providerId Provider ID
+ * @param  {Function} cb       Callback
+ * @returns {void}
+ */
+function applyProviderLimit(providerId, cb) {
+  if (!providerId) {
+    cb();
+  }
+
+  var provider = providersLimiters[providerId];
+  if (!provider || !provider.global) {
+    cb();
+  }
+
+  provider.global.removeTokens(1, function(err, remainingRequests) {
+    if (err || remainingRequests === -1) {
+      // Throw error rate limit exceeded
+      cb(new RateLimitExceeded(RateLimitExceeded.PROVIDER_LIMIT_EXCEEDED));
+    }
+    cb();
+  }, true);
+}
+
+
+/**
+ * Apply limits on a provider's consumer.
+ *
+ * @param  {String}   providerId Provider ID
+ * @param  {String}   consumerId Consumer ID
+ * @param  {Function} cb         Callback
+ * @returns {void}
+ */
+function applyProviderConsumerLimit(providerId, consumerId, cb) {
+  if (!providerId || !consumerId) {
+    cb();
+  }
+
+  var provider = providersLimiters[providerId];
+  if (!provider || !provider.consumers) {
+    cb();
+  }
+
+  var limiter = provider.consumers[consumerId];
+  if (!limiter) {
+    cb();
+  }
+
+  limiter.removeTokens(1, function(err, remainingRequests) {
+    if (err || remainingRequests === -1) {
+      // Throw error rate limit exceeded
+      cb(new RateLimitExceeded(RateLimitExceeded.PROVIDER_CONSUMER_LIMIT_EXCEEDED));
+    }
+    cb();
+  }, true);
+}
+
+
+/**
+ * Simple rate limit implementation.
+ * Limits can be applied globally, on a concrete provider, on a concrete
+ * consumer or on a concrete provider's consumer.
+ *
  * Allowed configuration properties:
  *
  * @example
- * { 
+ * {
  *   "global" : {
  *     "tokens" : 150,
  *     "interval" : "hour"
  *   },
- * 
+ *
  *   "consumers" : {
  *     "userA" : {
  *       "tokens" : 150,
  *       "interval" : "hour"
  *     }
  *   },
- * 
+ *
  *   "providers" : {
  *     "providerA" : {
  *       "global" : {
  *         "tokens" : 150,
  *         "interval" : "hour"
  *       },
- * 
+ *
  *       "consumers" : {
  *         "userA" : {
  *           "tokens" : 150,
  *           "interval" : "hour"
  *         }
- *       }            
+ *       }
  *     }
  *   }
  * }
@@ -59,6 +271,9 @@ util.inherits(RateLimitExceeded, Error);
  */
 module.exports.init = function(name, config) {
 
+  //
+  // TODO - Check global, consumers and providers are well formed.
+  //
   // Check for configuration parameters
   var hasConsumers = config.consumers && Object.keys(config.consumers).length > 0;
   var hasProviders = config.providers && Object.keys(config.providers).length > 0;
@@ -66,188 +281,45 @@ module.exports.init = function(name, config) {
     throw new Error("'simple-rate-limit': Invalid filter parameters !!! At least one global, consumer or provider must be specified.");
   }
 
-  /**
-   * Global rate limiter.
-   *
-   * @type {Object}
-   */
-  var globalLimiter;
-  /**
-   * Stores the limiter for each provider and the concrete limiter of each
-   * provider's user:
-   *
-   * {
-   *   providerA: {
-   *     global: [provider limiter],
-   *     consumers: {
-   *       userA: [userA limiter],
-   *       userB: [userB limiter],
-   *       ...
-   *     }
-   *   }
-   * }
-   * 
-   * @type {Object}
-   */
-  var providersLimiters = {};
-  /**
-   * Stores the limiter of each user, when the limit is applied to the user no
-   * matter which provider queries:
-   *
-   * {
-   *   userA: [userA limiter],
-   *   userB: [userB limiter],
-   *   ...
-   * }
-   * 
-   * @type {Object}
-   */
-  var consumersLimiters = {};
+  // Initialize limiters
+  initializeLimiters(config);
 
-
-  function initializeLimiters(config) {
-
-    var parseGlobal = function(cfg) {
-      var limiter;
-      if (cfg.global) {
-        limiter = new RateLimiter(cfg.global.tokens, cfg.global.interval);
-      }
-      return limiter;
-    };
-
-    var parseConsumers = function(cfg) {
-      var prop, limitConfig, limiters = {};
-      if (cfg.consumers) {
-        for (prop in cfg.consumers) {
-          limitConfig = cfg.consumers[prop];
-          limiters[prop] = new RateLimiter(limitConfig.tokens, limitConfig.interval)
-        }
-      }
-      return limiters;
-    };
-
-    var parseProviders = function(cfg) {
-      var prop, limitConfig, limiters = {};
-      if (cfg.providers) {
-        for (prop in cfg.providers) {
-          limitConfig = cfg.providers[prop];
-          limiters[prop] = {};
-
-          if (limitConfig.global) {
-            limiters[prop].global = parseGlobal(limitConfig);
-          }
-
-          if (limitConfig.consumers) {
-            limiters[prop].consumers = parseConsumers(limitConfig.consumers);
-          }
-        }
-      }
-      return limiters;
-    };
-
-    globalLimiter = parseGlobal(config);
-    consumersLimiters = parseConsumers(config);
-    providersLimiters = parseProviders(config);
-  }
-
-  // function getProviderLimiter(provider) {
-  //   if (providerLimiter[provider]) {
-
-  //   }
-
-  //   var limiter = providerLimiter[provider];
-  //   if(!limiter) {
-  //     limiter = new RateLimiter(150, 'hour');
-  //     providerLimiter[provider] = limiter;
-  //   }
-  //   return limiter;
-  // }
-
-  // function getUserLimiter(userid) {
-  //   var limiter = userLimiter[userid];
-  //   if(!limiter) {
-  //     limiter = new RateLimiter(150, 'hour');
-  //     userLimiter[userid] = limiter;
-  //   }
-  //   return limiter;
-  // }
-
-  // function getUserProviderLimiter(provider, userid) {
-  //   // TODO
-  // }
-
-  // req.user is undefined if there is no user authenticated.
+  // Return middleware function that applies rates limits
   return function(req, res, next) {
 
-    if (!req.provider && !req.user) {
+    //
+    // Limits are applied in the order:
+    //
+    //  global -> consumer -> provider -> provier-consumer
+    //
+    // TODO - Improve using promises
+    //
+    applyGlobalLimit(function(errGlobal) {
+      if (errGlobal) {
+        next(errGlobal);
+      }
 
-      //
-      // Global rate limit
-      //
-
-      globalLimiter.removeTokens(1, function(err, remainingRequests) {
-        if(err || remainingRequests === -1) {
-          // Throw error rate limit exceeded
-          next(new RateLimitExceeded());
-        }
-        next();
-      }, true);
-
-    } else if (req.provider && !req.user) {
-
-      //
-      // Provider rate limited no matter of user
-      //
-
-      var limiter = getProviderLimiter(req.provider);
-      limiter.removeTokens(1, function(err, remainingRequests) {
-        if(err || remainingRequests === -1) {
-          // Throw error rate limit exceeded
-          next(new RateLimitExceeded("Provider quota exceeded."));
-        }
-        next();
-      }, true);
-
-    } else if (!req.provider && req.user) {
-
-      //
-      // User rate limited no matter of provider
-      //
-
-      var limiter = getUserLimiter(req.provider);
-      limiter.removeTokens(1, function(err, remainingRequests) {
-        if(err || remainingRequests === -1) {
-          // Throw error rate limit exceeded
-          next(new RateLimitExceeded("User quota exceeded."));
-        }
-        next();
-      }, true);
-    } else if(req.provider && req.user) {
-
-      //
-      // Provider rate limited by user
-      //
-
-      // Chck limit on the provider
-      var limiter = getProviderLimiter(req.provider);
-      limiter.removeTokens(1, function(err, remainingRequests) {
-        if(err || remainingRequests === -1) {
-          // Throw error rate limit exceeded
-          next(new RateLimitExceeded());
+      applyConsumerLimit(function(errConsumer) {
+        if (errConsumer) {
+          next(errConsumer);
         }
 
-        // Check limit on the user
+        applyProviderLimit(function(errProvider) {
+          if (errProvider) {
+            next(errProvider);
+          }
 
-        next();
-      }, true);
+          applyProviderConsumerLimit(function(err) {
+            if (err) {
+              next(err);
+            }
 
-      // Apply limit on the user
-    }
+            next();
+          });
+        });
+      });
+    });
 
-    console.log("----> RATE_LIMIT ", req.user, req.provider);
-
-    next();
   };
 
-  
 };
