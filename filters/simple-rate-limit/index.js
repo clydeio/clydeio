@@ -28,50 +28,14 @@ RateLimitExceeded.PROVIDER_CONSUMER_LIMIT_EXCEEDED = "Consumer quota on the prov
 
 
 /**
- * Global rate limiter.
+ * Creates the limiters corresponding to the specified configuration. The new
+ * object has the same properties with limiters as values.
  *
- * @type {Object}
- */
-var globalLimiter;
-/**
- * Stores the limiter for each provider and the concrete limiter of each
- * provider's consumer:
- *
- * {
- *   providerA: {
- *     global: [provider limiter],
- *     consumers: {
- *       userA: [userA limiter],
- *       userB: [userB limiter],
- *       ...
- *     }
- *   }
- * }
- *
- * @type {Object}
- */
-var providersLimiters = {};
-/**
- * Stores the limiter of each consumer, when the limit is applied to the
- * consumer no matter which provider queries:
- *
- * {
- *   userA: [userA limiter],
- *   userB: [userB limiter],
- *   ...
- * }
- *
- * @type {Object}
- */
-var consumersLimiters = {};
-
-/**
- * Initialize limiters from configuration.
- *
+ * @private
  * @param  {Object} config Configuration
- * @returns {void}
+ * @returns {Object} Limiters parsed from configuration.
  */
-function initializeLimiters(config) {
+function parseLimiters(config) {
 
   function parseGlobal(cfg) {
     var limiter;
@@ -85,8 +49,10 @@ function initializeLimiters(config) {
     var prop, limitConfig, limiters = {};
     if (cfg.consumers) {
       for (prop in cfg.consumers) {
-        limitConfig = cfg.consumers[prop];
-        limiters[prop] = new RateLimiter(limitConfig.tokens, limitConfig.interval);
+        if ({}.hasOwnProperty.call(cfg.consumers, prop)) {
+          limitConfig = cfg.consumers[prop];
+          limiters[prop] = new RateLimiter(limitConfig.tokens, limitConfig.interval);
+        }
       }
     }
     return limiters;
@@ -96,15 +62,17 @@ function initializeLimiters(config) {
     var prop, limitConfig, limiters = {};
     if (cfg.providers) {
       for (prop in cfg.providers) {
-        limitConfig = cfg.providers[prop];
-        limiters[prop] = {};
+        if ({}.hasOwnProperty.call(cfg.providers, prop)) {
+          limitConfig = cfg.providers[prop];
+          limiters[prop] = {};
 
-        if (limitConfig.global) {
-          limiters[prop].global = parseGlobal(limitConfig);
-        }
+          if (limitConfig.global) {
+            limiters[prop].global = parseGlobal(limitConfig);
+          }
 
-        if (limitConfig.consumers) {
-          limiters[prop].consumers = parseConsumers(limitConfig.consumers);
+          if (limitConfig.consumers) {
+            limiters[prop].consumers = parseConsumers(limitConfig.consumers);
+          }
         }
       }
     }
@@ -112,19 +80,23 @@ function initializeLimiters(config) {
   }
 
   // Parse configuration
-  globalLimiter = parseGlobal(config);
-  consumersLimiters = parseConsumers(config);
-  providersLimiters = parseProviders(config);
+  return {
+    global: parseGlobal(config),
+    consumers: parseConsumers(config),
+    providers: parseProviders(config)
+  };
 }
 
 
 /**
  * Apply global rate limits.
  *
+ * @private
+ * @param {Object} globalLimiter Limiter
  * @param  {Function} cb Callback.
  * @returns {void}
  */
-function applyGlobalLimit(cb) {
+function applyGlobalLimit(globalLimiter, cb) {
   if (!globalLimiter) {
     cb();
   }
@@ -142,12 +114,13 @@ function applyGlobalLimit(cb) {
 /**
  * Apply limits on consumers.
  *
+ * @param {Object} consumersLimiters Consumers configuration
  * @param  {String}   consumerId Consumer ID
  * @param  {Function} cb       Callback
  * @returns {void}
  */
-function applyConsumerLimit(consumerId, cb) {
-  if (!consumerId) {
+function applyConsumerLimit(consumersLimiters, consumerId, cb) {
+  if (!consumersLimiters || !consumerId) {
     cb();
   }
 
@@ -169,12 +142,14 @@ function applyConsumerLimit(consumerId, cb) {
 /**
  * Apply limits on providers.
  *
+ * @private
+ * @param {Object} providersLimiters Providers limiters
  * @param  {String}   providerId Provider ID
  * @param  {Function} cb       Callback
  * @returns {void}
  */
-function applyProviderLimit(providerId, cb) {
-  if (!providerId) {
+function applyProviderLimit(providersLimiters, providerId, cb) {
+  if (!providersLimiters || !providerId) {
     cb();
   }
 
@@ -196,13 +171,15 @@ function applyProviderLimit(providerId, cb) {
 /**
  * Apply limits on a provider's consumer.
  *
+ * @private
+ * @param {Object} providersLimiters Providers limiters
  * @param  {String}   providerId Provider ID
  * @param  {String}   consumerId Consumer ID
  * @param  {Function} cb         Callback
  * @returns {void}
  */
-function applyProviderConsumerLimit(providerId, consumerId, cb) {
-  if (!providerId || !consumerId) {
+function applyProviderConsumerLimit(providersLimiters, providerId, consumerId, cb) {
+  if (!providersLimiters || !providerId || !consumerId) {
     cb();
   }
 
@@ -272,7 +249,7 @@ function applyProviderConsumerLimit(providerId, consumerId, cb) {
 module.exports.init = function(name, config) {
 
   //
-  // TODO - Check global, consumers and providers are well formed.
+  // TODO - Check global, consumers and providers are well formedand has token-interval.
   //
   // Check for configuration parameters
   var hasConsumers = config.consumers && Object.keys(config.consumers).length > 0;
@@ -282,34 +259,34 @@ module.exports.init = function(name, config) {
   }
 
   // Initialize limiters
-  initializeLimiters(config);
+  var limiters = parseLimiters(config);
 
   // Return middleware function that applies rates limits
   return function(req, res, next) {
 
     //
-    // Limits are applied in the order:
-    //
-    //  global -> consumer -> provider -> provier-consumer
+    // Apply rate limits.
+    // The chain of limitations follow the order: global, consumer, provider
+    // and provider-consumer.
     //
     // TODO - Improve using promises
     //
-    applyGlobalLimit(function(errGlobal) {
+    applyGlobalLimit(limiters.global, function(errGlobal) {
       if (errGlobal) {
         next(errGlobal);
       }
 
-      applyConsumerLimit(function(errConsumer) {
+      applyConsumerLimit(limiters.consumers, function(errConsumer) {
         if (errConsumer) {
           next(errConsumer);
         }
 
-        applyProviderLimit(function(errProvider) {
+        applyProviderLimit(limiters.providers, function(errProvider) {
           if (errProvider) {
             next(errProvider);
           }
 
-          applyProviderConsumerLimit(function(err) {
+          applyProviderConsumerLimit(limiters.providers, function(err) {
             if (err) {
               next(err);
             }
