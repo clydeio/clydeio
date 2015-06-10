@@ -264,6 +264,12 @@ module.exports.init = function(name, config) {
   // Return middleware function that applies rates limits
   return function(req, res, next) {
 
+    var consumerId,
+        providerId = req.provider;
+    if (req.user || req.user.userId) {
+      consumerId = req.user.userId;
+    }
+
     //
     // Apply rate limits.
     // The chain of limitations follow the order: global, consumer, provider
@@ -276,17 +282,17 @@ module.exports.init = function(name, config) {
         next(errGlobal);
       }
 
-      applyConsumerLimit(limiters.consumers, function(errConsumer) {
+      applyConsumerLimit(limiters.consumers, consumerId, function(errConsumer) {
         if (errConsumer) {
           next(errConsumer);
         }
 
-        applyProviderLimit(limiters.providers, function(errProvider) {
+        applyProviderLimit(limiters.providers, providerId, function(errProvider) {
           if (errProvider) {
             next(errProvider);
           }
 
-          applyProviderConsumerLimit(limiters.providers, function(err) {
+          applyProviderConsumerLimit(limiters.providers, providerId, consumerId, function(err) {
             if (err) {
               next(err);
             }

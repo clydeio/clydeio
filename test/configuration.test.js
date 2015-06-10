@@ -6,7 +6,7 @@ var configuration = require("../lib/configuration");
 var InvalidConfiguration = require("../lib/errors/invalid-configuration");
 
 
-describe("Configuration", function() {
+describe("configuration", function() {
 
   before(function() {
     configuration.base(__dirname);
