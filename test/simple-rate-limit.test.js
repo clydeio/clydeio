@@ -13,21 +13,22 @@ describe("simple-rate-limit", function() {
     configuration.base(path.join(__dirname, ".."));
   });
 
-  it("should return error because invalid prefilter specified", function(done) {
+  it("should fail due global limit exceed", function(done) {
     var configJS = require("./fixtures/config-rate-limit-global.json");
     var config = configuration.load(configJS);
     var rateLimit = config.getPrefilterByName("rate-limit");
 
-    rateLimit.middleware({}, {}, function(err){console.log("NEXT 1 !!!", err);});
-    rateLimit.middleware({}, {}, function(err){console.log("NEXT 2 !!!", err);});
-    rateLimit.middleware({}, {}, function(err){console.log("NEXT 3 !!!", err);});
-    rateLimit.middleware({}, {}, function(err){console.log("NEXT 4 !!!", err);});
-    rateLimit.middleware({}, {}, function(err){console.log("NEXT 5 !!!", err);});
+    // Configuration allows 1 call per second, so first call must be fine and
+    // the second must fail.
+    rateLimit.middleware({}, {}, function(err){
+      expect(err).to.be.undefined;
+    });
 
-    setTimeout(function() {
-      rateLimit.middleware({}, {}, function(err){console.log("NEXT . !!!", err);});
-    }, 100);
+    rateLimit.middleware({}, {}, function(err){
+      expect(err.name).to.be.equal("RateLimitExceeded");
+    });
 
+    done();
   });
 
 });
