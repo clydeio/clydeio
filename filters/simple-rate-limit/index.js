@@ -51,7 +51,7 @@ function parseLimiters(config) {
       for (prop in cfg.consumers) {
         if ({}.hasOwnProperty.call(cfg.consumers, prop)) {
           limitConfig = cfg.consumers[prop];
-          limiters[prop] = new RateLimiter(limitConfig.tokens, limitConfig.interval, true);
+          limiters[prop] = new RateLimiter(limitConfig.tokens, limitConfig.interval);
         }
       }
     }
@@ -98,22 +98,14 @@ function parseLimiters(config) {
  */
 function applyGlobalLimit(globalLimiter, cb) {
   if (!globalLimiter) {
-    console.log("AGL: no global");
     return cb();
   }
 
-  console.log("AGL: before remove");
-  globalLimiter.removeTokens(1, function(err, remainingRequests) {
-    console.log("AGL: remove");
-    if (err || remainingRequests === -1) {
-      console.log("AGL: no remaining ", err, remainingRequests);
-      // Throw error rate limit exceeded
-      return cb(new RateLimitExceeded(RateLimitExceeded.GLOBAL_LIMIT_EXCEEDED));
-    }
+  if (!globalLimiter.tryRemoveTokens(1)) {
+    return cb(new RateLimitExceeded(RateLimitExceeded.GLOBAL_LIMIT_EXCEEDED));
+  }
 
-    console.log("AGL: before renturn");
-    return cb();
-  });
+  return cb();
 }
 
 
@@ -135,13 +127,11 @@ function applyConsumerLimit(consumersLimiters, consumerId, cb) {
     return cb();
   }
 
-  limiter.removeTokens(1, function(err, remainingRequests) {
-    if (err || remainingRequests === -1) {
-      // Throw error rate limit exceeded
-      return cb(new RateLimitExceeded(RateLimitExceeded.CONSUMER_LIMIT_EXCEEDED));
-    }
-    return cb();
-  }, true);
+  if (!limiter.tryRemoveTokens(1)) {
+    return cb(new RateLimitExceeded(RateLimitExceeded.CONSUMER_LIMIT_EXCEEDED));
+  }
+
+  return cb();
 }
 
 
@@ -164,13 +154,11 @@ function applyProviderLimit(providersLimiters, providerId, cb) {
     return cb();
   }
 
-  provider.global.removeTokens(1, function(err, remainingRequests) {
-    if (err || remainingRequests === -1) {
-      // Throw error rate limit exceeded
-      return cb(new RateLimitExceeded(RateLimitExceeded.PROVIDER_LIMIT_EXCEEDED));
-    }
-    return cb();
-  }, true);
+  if (!provider.global.tryRemoveTokens(1)) {
+    return cb(new RateLimitExceeded(RateLimitExceeded.PROVIDER_LIMIT_EXCEEDED));
+  }
+
+  return cb();
 }
 
 
@@ -200,14 +188,11 @@ function applyProviderConsumerLimit(providersLimiters, providerId, consumerId, c
     return cb();
   }
 
-  limiter.removeTokens(1, function(err, remainingRequests) {
-    if (err || remainingRequests === -1) {
-      // Throw error rate limit exceeded
-      return cb(new RateLimitExceeded(RateLimitExceeded.PROVIDER_CONSUMER_LIMIT_EXCEEDED));
-    }
+  if (!limiter.tryRemoveTokens(1)) {
+    return cb(new RateLimitExceeded(RateLimitExceeded.PROVIDER_CONSUMER_LIMIT_EXCEEDED));
+  }
 
-    return cb();
-  }, true);
+  return cb();
 }
 
 
@@ -257,7 +242,7 @@ function applyProviderConsumerLimit(providersLimiters, providerId, consumerId, c
 module.exports.init = function(name, config) {
 
   //
-  // TODO - Check global, consumers and providers are well formedand has token-interval.
+  // TODO - Check global, consumers and providers are well formed and has token-interval.
   //
   // Check for configuration parameters
   var hasConsumers = config.consumers && Object.keys(config.consumers).length > 0;
@@ -287,25 +272,25 @@ module.exports.init = function(name, config) {
     //
     applyGlobalLimit(limiters.global, function(errGlobal) {
       if (errGlobal) {
-        next(errGlobal);
+        return next(errGlobal);
       }
 
       applyConsumerLimit(limiters.consumers, consumerId, function(errConsumer) {
         if (errConsumer) {
-          next(errConsumer);
+          return next(errConsumer);
         }
 
         applyProviderLimit(limiters.providers, providerId, function(errProvider) {
           if (errProvider) {
-            next(errProvider);
+            return next(errProvider);
           }
 
           applyProviderConsumerLimit(limiters.providers, providerId, consumerId, function(err) {
             if (err) {
-              next(err);
+              return next(err);
             }
 
-            next();
+            return next();
           });
         });
       });
