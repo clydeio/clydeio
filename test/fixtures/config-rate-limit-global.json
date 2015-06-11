@@ -5,8 +5,8 @@
       "path" : "./filters/simple-rate-limit",
       "config" : {
         "global" : {
-          "tokens" : 150,
-          "interval" : "hour"
+          "tokens" : 2,
+          "interval" : "second"
         }
       }
     }

@@ -51,7 +51,7 @@ function parseLimiters(config) {
       for (prop in cfg.consumers) {
         if ({}.hasOwnProperty.call(cfg.consumers, prop)) {
           limitConfig = cfg.consumers[prop];
-          limiters[prop] = new RateLimiter(limitConfig.tokens, limitConfig.interval);
+          limiters[prop] = new RateLimiter(limitConfig.tokens, limitConfig.interval, true);
         }
       }
     }
@@ -98,16 +98,22 @@ function parseLimiters(config) {
  */
 function applyGlobalLimit(globalLimiter, cb) {
   if (!globalLimiter) {
-    cb();
+    console.log("AGL: no global");
+    return cb();
   }
 
+  console.log("AGL: before remove");
   globalLimiter.removeTokens(1, function(err, remainingRequests) {
+    console.log("AGL: remove");
     if (err || remainingRequests === -1) {
+      console.log("AGL: no remaining ", err, remainingRequests);
       // Throw error rate limit exceeded
-      cb(new RateLimitExceeded(RateLimitExceeded.GLOBAL_LIMIT_EXCEEDED));
+      return cb(new RateLimitExceeded(RateLimitExceeded.GLOBAL_LIMIT_EXCEEDED));
     }
-    cb();
-  }, true);
+
+    console.log("AGL: before renturn");
+    return cb();
+  });
 }
 
 
@@ -120,21 +126,21 @@ function applyGlobalLimit(globalLimiter, cb) {
  * @returns {void}
  */
 function applyConsumerLimit(consumersLimiters, consumerId, cb) {
-  if (!consumersLimiters || !consumerId) {
-    cb();
+  if (!Object.keys(consumersLimiters).length || !consumerId) {
+    return cb();
   }
 
   var limiter = consumersLimiters[consumerId.userid];
   if (!limiter) {
-    cb();
+    return cb();
   }
 
   limiter.removeTokens(1, function(err, remainingRequests) {
     if (err || remainingRequests === -1) {
       // Throw error rate limit exceeded
-      cb(new RateLimitExceeded(RateLimitExceeded.CONSUMER_LIMIT_EXCEEDED));
+      return cb(new RateLimitExceeded(RateLimitExceeded.CONSUMER_LIMIT_EXCEEDED));
     }
-    cb();
+    return cb();
   }, true);
 }
 
@@ -149,21 +155,21 @@ function applyConsumerLimit(consumersLimiters, consumerId, cb) {
  * @returns {void}
  */
 function applyProviderLimit(providersLimiters, providerId, cb) {
-  if (!providersLimiters || !providerId) {
-    cb();
+  if (!Object.keys(providersLimiters).length || !providerId) {
+    return cb();
   }
 
   var provider = providersLimiters[providerId];
   if (!provider || !provider.global) {
-    cb();
+    return cb();
   }
 
   provider.global.removeTokens(1, function(err, remainingRequests) {
     if (err || remainingRequests === -1) {
       // Throw error rate limit exceeded
-      cb(new RateLimitExceeded(RateLimitExceeded.PROVIDER_LIMIT_EXCEEDED));
+      return cb(new RateLimitExceeded(RateLimitExceeded.PROVIDER_LIMIT_EXCEEDED));
     }
-    cb();
+    return cb();
   }, true);
 }
 
@@ -179,26 +185,28 @@ function applyProviderLimit(providersLimiters, providerId, cb) {
  * @returns {void}
  */
 function applyProviderConsumerLimit(providersLimiters, providerId, consumerId, cb) {
-  if (!providersLimiters || !providerId || !consumerId) {
-    cb();
+
+  if (!Object.keys(providersLimiters).length || !providerId || !consumerId) {
+    return cb();
   }
 
   var provider = providersLimiters[providerId];
   if (!provider || !provider.consumers) {
-    cb();
+    return cb();
   }
 
   var limiter = provider.consumers[consumerId];
   if (!limiter) {
-    cb();
+    return cb();
   }
 
   limiter.removeTokens(1, function(err, remainingRequests) {
     if (err || remainingRequests === -1) {
       // Throw error rate limit exceeded
-      cb(new RateLimitExceeded(RateLimitExceeded.PROVIDER_CONSUMER_LIMIT_EXCEEDED));
+      return cb(new RateLimitExceeded(RateLimitExceeded.PROVIDER_CONSUMER_LIMIT_EXCEEDED));
     }
-    cb();
+
+    return cb();
   }, true);
 }
 
@@ -266,7 +274,7 @@ module.exports.init = function(name, config) {
 
     var consumerId,
         providerId = req.provider;
-    if (req.user || req.user.userId) {
+    if (req.user && req.user.userId) {
       consumerId = req.user.userId;
     }
 

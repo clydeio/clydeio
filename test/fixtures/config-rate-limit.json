@@ -1,0 +1,43 @@
+{
+  "prefilters" : [
+    {
+      "name" : "rate-limit",
+      "path" : "./filters/simple-rate-limit",
+      "config" : {
+        
+        "global" : {
+          "tokens" : 150,
+          "interval" : "hour"
+        },
+
+        "consumers" : {
+          "userA" : {
+            "tokens" : 150,
+            "interval" : "hour"
+          }
+        },
+
+        "providers" : {
+          "providerA" : {
+            "global" : {
+              "tokens" : 150,
+              "interval" : "hour"
+            },
+
+            "consumers" : {
+              "userA" : {
+                "tokens" : 150,
+                "interval" : "hour"
+              }
+            }            
+          }
+
+        }
+
+      }
+    }
+  ]
+
+  "providers" : [
+  ]
+}
