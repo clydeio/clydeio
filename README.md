@@ -6,7 +6,7 @@ Currently clyde is a proof of concept. It is unstable and in heavy development p
 
 # Clyde
 
-**Note:** Impressed by the [Kong](http://getkong.org/) project and by the need to protect a private API I started *Clyde* project. I choose the Clyde name because it is, like Kong, the name of one of the most famous movie apes.
+> **Note:** Impressed by the [Kong](http://getkong.org/) project and by the need to protect a private API I started *Clyde* project. I choose the Clyde name because it is, like Kong, the name of one of the most famous movie apes.
 
 When developing a business API the most important part resides on designing the operations and the logic implementation. This is true but many times, in real life projects, we also need to make the API public introducing a new set of challenges like allowing authentication, log requests, control rate limiting, etc.
 
