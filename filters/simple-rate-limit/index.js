@@ -5,7 +5,25 @@ var util = require("util");
 
 
 /**
- * RateLimitExceeded error.
+ * InvalidRateLimitConfiguration error triggered when passed invalid configurations.
+ *
+ * @param {String} description Extended description
+ * @returns {void}
+ */
+function InvalidRateLimitConfiguration(description) {
+  Error.captureStackTrace(this, this.constructor);
+  this.status = 421;
+  this.name = this.constructor.name;
+  this.message = "Invalid rate limit configuration !!!";
+  if (description) {
+    this.message += " " + description;
+  }
+}
+util.inherits(InvalidRateLimitConfiguration, Error);
+
+
+/**
+ * RateLimitExceeded error triggered with a rate limit is exceeded.
  *
  * @param {String} description Extended description
  * @returns {void}
@@ -28,6 +46,73 @@ RateLimitExceeded.PROVIDER_CONSUMER_LIMIT_EXCEEDED = "Consumer quota on the prov
 
 
 /**
+ * Validate the configuration parameters.
+ *
+ * @param  {Object} config Configuration
+ * @returns {void}
+ */
+function validateConfig(config) {
+
+  function isValidGlobal(globalCfg) {
+    if (globalCfg && (!globalCfg.tokens || !globalCfg.interval)) {
+      return false;
+    }
+    return true;
+  }
+
+  function isValidConsumers(consumersCfg) {
+    var prop, limitConfig;
+    if (consumersCfg) {
+      for (prop in consumersCfg) {
+        if ({}.hasOwnProperty.call(consumersCfg, prop)) {
+          limitConfig = consumersCfg[prop];
+          if (limitConfig && (!limitConfig.tokens || !limitConfig.interval)) {
+            return false;
+          }
+        }
+      }
+    }
+    return true;
+  }
+
+  function isValidProviders(providersCfg) {
+    var prop, limitConfig;
+    if (providersCfg) {
+      for (prop in providersCfg) {
+        if ({}.hasOwnProperty.call(providersCfg, prop)) {
+          limitConfig = providersCfg[prop];
+
+          if (limitConfig.global && !isValidGlobal(limitConfig.global)) {
+            return false;
+          }
+
+          if (limitConfig.consumers && !isValidConsumers(limitConfig.consumers)) {
+            return false;
+          }
+        }
+      }
+    }
+    return true;
+  }
+
+  if (!config.global && !config.consumers && !config.providers) {
+    throw new InvalidRateLimitConfiguration("At least one global, consumers or providers entry is required.");
+  }
+
+  if (!isValidGlobal(config.global)) {
+    throw new InvalidRateLimitConfiguration("Invalid global section.");
+  }
+
+  if (!isValidConsumers(config.consumers)) {
+    throw new InvalidRateLimitConfiguration("Invalid consumers section.");
+  }
+
+  if (!isValidProviders(config.providers)) {
+    throw new InvalidRateLimitConfiguration("Invalid providers section.");
+  }
+}
+
+/**
  * Creates the limiters corresponding to the specified configuration. The new
  * object has the same properties with limiters as values.
  *
@@ -37,20 +122,20 @@ RateLimitExceeded.PROVIDER_CONSUMER_LIMIT_EXCEEDED = "Consumer quota on the prov
  */
 function parseLimiters(config) {
 
-  function parseGlobal(cfg) {
+  function parseGlobal(globalCfg) {
     var limiter;
-    if (cfg.global) {
-      limiter = new RateLimiter(cfg.global.tokens, cfg.global.interval);
+    if (globalCfg.global) {
+      limiter = new RateLimiter(globalCfg.global.tokens, globalCfg.global.interval);
     }
     return limiter;
   }
 
-  function parseConsumers(cfg) {
+  function parseConsumers(consumersCfg) {
     var prop, limitConfig, limiters = {};
-    if (cfg.consumers) {
-      for (prop in cfg.consumers) {
-        if ({}.hasOwnProperty.call(cfg.consumers, prop)) {
-          limitConfig = cfg.consumers[prop];
+    if (consumersCfg) {
+      for (prop in consumersCfg) {
+        if ({}.hasOwnProperty.call(consumersCfg, prop)) {
+          limitConfig = consumersCfg[prop];
           limiters[prop] = new RateLimiter(limitConfig.tokens, limitConfig.interval);
         }
       }
@@ -58,12 +143,12 @@ function parseLimiters(config) {
     return limiters;
   }
 
-  function parseProviders(cfg) {
+  function parseProviders(providersCfg) {
     var prop, limitConfig, limiters = {};
-    if (cfg.providers) {
-      for (prop in cfg.providers) {
-        if ({}.hasOwnProperty.call(cfg.providers, prop)) {
-          limitConfig = cfg.providers[prop];
+    if (providersCfg) {
+      for (prop in providersCfg) {
+        if ({}.hasOwnProperty.call(providersCfg, prop)) {
+          limitConfig = providersCfg[prop];
           limiters[prop] = {};
 
           if (limitConfig.global) {
@@ -82,8 +167,8 @@ function parseLimiters(config) {
   // Parse configuration
   return {
     global: parseGlobal(config),
-    consumers: parseConsumers(config),
-    providers: parseProviders(config)
+    consumers: parseConsumers(config.consumers),
+    providers: parseProviders(config.providers)
   };
 }
 
@@ -122,7 +207,7 @@ function applyConsumerLimit(consumersLimiters, consumerId, cb) {
     return cb();
   }
 
-  var limiter = consumersLimiters[consumerId.userid];
+  var limiter = consumersLimiters[consumerId];
   if (!limiter) {
     return cb();
   }
@@ -173,7 +258,6 @@ function applyProviderLimit(providersLimiters, providerId, cb) {
  * @returns {void}
  */
 function applyProviderConsumerLimit(providersLimiters, providerId, consumerId, cb) {
-
   if (!Object.keys(providersLimiters).length || !providerId || !consumerId) {
     return cb();
   }
@@ -241,15 +325,8 @@ function applyProviderConsumerLimit(providersLimiters, providerId, consumerId, c
  */
 module.exports.init = function(name, config) {
 
-  //
-  // TODO - Check global, consumers and providers are well formed and has token-interval.
-  //
-  // Check for configuration parameters
-  var hasConsumers = config.consumers && Object.keys(config.consumers).length > 0;
-  var hasProviders = config.providers && Object.keys(config.providers).length > 0;
-  if (!config || (!config.global && !hasConsumers && !hasProviders) ) {
-    throw new Error("'simple-rate-limit': Invalid filter parameters !!! At least one global, consumer or provider must be specified.");
-  }
+  // Validate configuration
+  validateConfig(config);
 
   // Initialize limiters
   var limiters = parseLimiters(config);
