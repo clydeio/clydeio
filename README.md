@@ -18,6 +18,8 @@ Clyde is extremely configurable and allows process the request from consumers to
 
 The core of Clyde is responsible to read the configuration, load the required filters and connect them to be executed in the desired order. The real job is done by each filter: rate limiting, authentication, logging, etc.
 
+![The big picture](https://raw.githubusercontent.com/acanimal/clyde/master/doc/bigpicture.png)
+
 ## Filters
 
 A filter is any kind *middleware*, following the [connect](https://github.com/senchalabs/connect) language, that receives the `request`, `response` and `next` parameters. In fact, Clyde (and some of its basic filters) is implemented using [connect](https://github.com/senchalabs/connect) project.
