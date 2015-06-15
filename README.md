@@ -12,7 +12,7 @@ When developing a business API the most important part resides on designing the 
 
 The goal of Clyde is to simplify our live, allowing us to concentrate on the implementation of our API business logic and leaving the rest to Clyde.
 
-![Clyde](https://raw.githubusercontent.com/acanimal/clyde/master/doc/clyde.png)
+![Clyde](doc/clyde.png)
 
 Clyde acts as a mediator (a man in the middle or a proxy) that allows to communicate the external clients, the **consumers**, with any number of private APIs, the **providers**. It allows to process the requests from consumers to providers and the responses from the providers to the consumers.
 
@@ -49,21 +49,34 @@ The sequence of actions is explained in the next figure and goes as follows:
     * After sent to the provider, the response passes a set of *provider's postfilters*.
 * Finally, the response passes a set of *global postfilters*.
 
-![The big picture](https://raw.githubusercontent.com/acanimal/clyde/master/doc/dataflow.png)
+![The big picture](doc/dataflow.png)
 
 This sequence allows maximum flexibility. The same filter can be set as global prefilter, provider's prefilter or global postfilter. It is up to you and, the possibilities of the filter, where to configure to be executed.
 
 
+## Authentication
+
+You are free to implement custom filters following your own rules but, as many times, conventions are a good thing so everybody can work following the same patterns.
+
+Plugins, like the *rate limiter* are flexible enough to be applied globally or specifically to limit the access of a given customer on a given provider. To achieve this, the filter need to know the provider the request is addressed and the consumer is making the request.
+
+For this purpose, each time a request arrives to a *provider configuration zone* (see picture) a new property `provider` is set within the middleware's `request` object with the *context* of the provider as value. Provider's context must be unique, so it is a good value to be used. This way, any filter that makes actions depending on the provider can use the `req.provider` property to know the provider.
+
+![Provider's config](doc/provider_config.png)
+
+On the other hand and, as a convention, any module that authenticates users (the consumers) must add a `user` object to the `request` object with a property `userId`. This way, any subsequent filter that wants to make actions depending on the consumer can use `req.user.userId` to know the current user.
+
+
 ## Custom filters
 
-Create new filters is extremely simple for a NodeJS developer. We simply need to create a module that exports an `init(name , config)` method resposible to return a middleware function:
+Create new filters is extremely simple (and most if you are a NodeJS developer with experience on *connect* or *express*). We simply need to create a module that exports an `init(name , config)` method responsible to return a middleware function:
 
     /**
-     - My custom filter.
-     - 
-     - @param  {String} name Name of the filter
-     - @param  {object} config JavaScript object with filter configuration
-     - @returns {middleware} Middleware function implementing the filter.
+     * My custom filter.
+     * 
+     * @param  {String} name Name of the filter
+     * @param  {object} config JavaScript object with filter configuration
+     * @returns {middleware} Middleware function implementing the filter.
      */
     module.exports.init = function(name, config) {
         return function(req, res, next) {
