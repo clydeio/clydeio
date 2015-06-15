@@ -12,7 +12,7 @@ When developing a business API the most important part resides on designing the 
 
 The goal of Clyde is to simplify our live, allowing us to concentrate on the implementation of our API business logic and leaving the rest to Clyde.
 
-![Clyde](https://raw.githubusercontent.com/acanimal/clyde/master/doc/clyde.png)
+![Clyde](doc/clyde.png)
 
 Clyde acts as a mediator (a man in the middle or a proxy) that allows to communicate the external clients, the **consumers**, with any number of private APIs, the **providers**. It allows to process the requests from consumers to providers and the responses from the providers to the consumers.
 
@@ -49,7 +49,7 @@ The sequence of actions is explained in the next figure and goes as follows:
     * After sent to the provider, the response passes a set of *provider's postfilters*.
 * Finally, the response passes a set of *global postfilters*.
 
-![The big picture](https://raw.githubusercontent.com/acanimal/clyde/master/doc/dataflow.png)
+![The big picture](doc/dataflow.png)
 
 This sequence allows maximum flexibility. The same filter can be set as global prefilter, provider's prefilter or global postfilter. It is up to you and, the possibilities of the filter, where to configure to be executed.
 
