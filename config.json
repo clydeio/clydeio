@@ -11,8 +11,8 @@
       }
     },
     {
-      "name" : "digest-auth",
-      "path" : "./filters/simple-digest-auth",
+      "name" : "hmac-auth",
+      "path" : "./filters/simple-hmac-auth",
       "config" : {
         "realm" : "clyde",
         "consumers" : {

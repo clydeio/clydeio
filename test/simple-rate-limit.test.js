@@ -14,7 +14,7 @@ describe("simple-rate-limit", function() {
   });
 
 
-  it("should fail due global limit exceed", function(done) {
+  it("should fail due global limit exceed", function() {
     var configJS = require("./fixtures/config-rate-limit-global.json");
     var config = configuration.load(configJS);
     var rateLimit = config.getPrefilterByName("rate-limit");
@@ -29,7 +29,6 @@ describe("simple-rate-limit", function() {
       expect(err.name).to.be.equal("RateLimitExceeded");
     });
 
-    done();
   });
 
 
