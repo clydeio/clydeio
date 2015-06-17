@@ -5,16 +5,9 @@ var Hmmac = require("hmmac");
 
 module.exports.init = function(name, config) {
 
-
   function credentialProvider(key, callback) {
-
-    console.error("--------> credentialProvider ----> ", key);
-
-    //T ODO - Get key/secret
-    callback({
-      key: "key",
-      secret: "secret"
-    });
+    // TODO - Get key/secret
+    callback({key: "keyA", secret: "secretA"});
   }
 
   // Hmmac options
@@ -25,7 +18,7 @@ module.exports.init = function(name, config) {
     credentialProviderTimeout: 15, // in seconds. time to wait for credentialProvider to return
     signatureEncoding: "hex", // signature encoding. valid = binary, hex or base64
     signedHeaders: [ "host", "content-type", "date" ],
-    wwwAuthenticateRealm: "API",
+    wwwAuthenticateRealm: config.realm || "clyde",
     scheme: Hmmac.schemes.load("plain")
   };
 

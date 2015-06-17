@@ -1,0 +1,21 @@
+{
+  "prefilters" : [
+    {
+      "name" : "hmac-auth",
+      "path" : "./filters/simple-hmac-auth",
+      "config" : {
+        "consumers" : {
+          "keyA" : "secretA"
+        }
+      }
+    }
+  ],
+
+  "providers" : [
+    {
+      "context" : "/prov1",
+      "name" : "provider1",
+      "target" : "http://localhost:8080"
+    }
+  ]
+}
