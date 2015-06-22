@@ -31,7 +31,7 @@ describe("simple-hamc-auth", function() {
   });
 
 
-  it("should due invalid hmac authentication", function(done) {
+  it("should fail due invalid hmac authentication", function(done) {
     var payload = 'hi, this is the BODY';
     var httpRequest = {
       host: 'localhost',
@@ -45,6 +45,7 @@ describe("simple-hamc-auth", function() {
       }
     };
     hmmac.sign(httpRequest, {key: "keyA", secret: "secretA"});
+
     var req = http.request(httpRequest, function(res) {
       if (res.statusCode === 200) {
         console.log('Success!');
@@ -55,7 +56,6 @@ describe("simple-hamc-auth", function() {
         throw new Error("Unauthorized");
       }
 
-      process.exit();
     });
 
     req.write(payload);
