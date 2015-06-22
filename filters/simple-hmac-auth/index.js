@@ -30,22 +30,13 @@ module.exports.init = function(name, config) {
     throw new Error("'simple-hmac-auth': Invalid filter parameters !!! At least one consumer must be specified");
   }
 
-  /**
-   * Provider function to get secret value from a given key value.
-   *
-   * @param  {String} key The key
-   * @param  {Function} callback Callback to be invoked. 
-   * @returns {String} The secret associated with the key
-   */
+  // Provider function to get secret value from a given key value.
   function credentialProvider(key, callback) {
-    process.nextTick(function() {
-      var secret = config.consumers[key];
-      if(!secret) {
-        return callback(null);
-      }
-      console.log("--->", {key: key, secret: secret});
-      return callback({key: key, secret: secret});
-    });
+    var secret = config.consumers[key];
+    if (!secret) {
+      return callback(null);
+    }
+    return callback({key: key, secret: secret});
   }
 
   // Hmmac options
@@ -53,13 +44,31 @@ module.exports.init = function(name, config) {
     algorithm: "sha256",
     acceptableDateSkew: 900, // in seconds, def 15 minutes. only done if date is signed
     credentialProvider: credentialProvider,
-    credentialProviderTimeout: 15, // in seconds. time to wait for credentialProvider to return
+    credentialProviderTimeout: 1, // in seconds. time to wait for credentialProvider to return
     signatureEncoding: "hex", // signature encoding. valid = binary, hex or base64
     signedHeaders: [ "host", "content-type", "date" ],
     wwwAuthenticateRealm: config.realm || "clyde",
     scheme: Hmmac.schemes.load("plain")
   };
+  // Create hmmac instance
+  var hmmac = new Hmmac(options);
+
+  // Custom responder function.
+  function customResponder(valid, req, res, next) {
+    if (valid === true) {
+      return next();
+    } else {
+      res.statusCode = 401;
+      if (hmmac.config.wwwAuthenticateRealm) {
+        res.setHeader("WWW-Authenticate", hmmac.config.scheme.getServiceLabel.call(hmmac)
+          + " realm=\"" + hmmac.config.wwwAuthenticateRealm.replace(/"/g, "'") + "\"");
+      }
+      var err = new Error("Unauthorized");
+      err.statusCode = 401;
+      return next(err);
+    }
+  }
 
   // Return hmmac middleware
-  return Hmmac.middleware(options);
+  return Hmmac.middleware(hmmac, customResponder);
 };

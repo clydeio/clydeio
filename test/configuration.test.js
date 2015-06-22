@@ -78,5 +78,4 @@ describe("configuration", function() {
     expect(config.postfilters).to.have.length(0);
   });
 
-
 });

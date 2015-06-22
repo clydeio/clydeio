@@ -12,7 +12,7 @@ var util = require("util");
  */
 function InvalidRateLimitConfiguration(description) {
   Error.captureStackTrace(this, this.constructor);
-  this.status = 421;
+  this.statusCode = 421;
   this.name = this.constructor.name;
   this.message = "Invalid rate limit configuration !!!";
   if (description) {
@@ -30,7 +30,7 @@ util.inherits(InvalidRateLimitConfiguration, Error);
  */
 function RateLimitExceeded(description) {
   Error.captureStackTrace(this, this.constructor);
-  this.status = 421;
+  this.statusCode = 421;
   this.name = this.constructor.name;
   this.message = "Too many requests !!!";
   if (description) {
