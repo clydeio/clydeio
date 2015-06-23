@@ -1,5 +1,17 @@
 #!/usr/bin/env node
 
+// try{
+//   var notexists = require("notexists");
+// } catch(err) {
+//   console.log("error ", err.code);
+// }
+
+// console.log("not ", notexists);
+
+// process.exit(0);
+// console.log("not shown");
+
+
 /*eslint no-use-before-define:0, no-process-exit:0*/
 
 "use strict";
@@ -7,7 +19,7 @@
 var http = require("http"),
     options = require("../lib/cli-options"),
     log = require("../lib/log"),
-    config = require("../config"),
+    config = require(options.configfile),
     clyde = require("../lib/clyde");
 
 /**
