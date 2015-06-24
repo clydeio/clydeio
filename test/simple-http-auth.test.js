@@ -1,8 +1,5 @@
-/* eslint no-unused-vars:0, no-unused-expressions:0 */
 "use strict";
 
-var path = require("path");
-var expect = require("chai").expect;
 var config = require("./fixtures/config-http-auth-basic.json");
 var http = require("http");
 var clyde = require("../lib/clyde");
@@ -35,29 +32,19 @@ describe("simple-http-auth", function() {
 
 
   it("should fail due invalid authentication", function(done) {
-    var body = "request body";
-    var httpRequest = {
-      host: "localhost",
-      port: 8888,
-      path: "/foo",
-      method: "GET",
-      headers: {
-        "x-auth-signedheaders": "host; content-type; date",
-        "Content-Type": "text/plain",
-        "Date": new Date().toUTCString()
-      }
-    };
+    request("http://127.0.0.1:8888")
+        .get("/foo")
+        .auth("bad-username", "bad-password")
+        .expect(401, done);
+  });
 
-    // Sign request with invalid secret
-    hmmac.sign(httpRequest, {key: "keyA", secret: "secret"});
-
-    // Make request
-    var req = http.request(httpRequest, function(res) {
-      expect(res.statusCode).to.be.equal(401);
-      done();
-    });
-
-    req.end(body);
+  it("should succes user authentication", function(done) {
+    // Note we expect a 404, which means we have authenticated successfully but
+    // no provider was found.
+    request("http://127.0.0.1:8888")
+        .get("/foo")
+        .auth("userA", "passwordA")
+        .expect(404, done);
   });
 
 });

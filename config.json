@@ -11,10 +11,11 @@
       }
     },
     {
-      "name" : "hmac-auth",
-      "path" : "./filters/simple-hmac-auth",
+      "name" : "basic-auth",
+      "path" : "./filters/simple-http-auth",
       "config" : {
         "realm" : "clyde",
+        "method" : "basic",
         "consumers" : {
           "userA" : "passA"
         }

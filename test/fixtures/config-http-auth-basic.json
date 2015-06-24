@@ -1,0 +1,23 @@
+{
+  "prefilters" : [
+    {
+      "name" : "basic-auth",
+      "path" : "./filters/simple-http-auth",
+      "config" : {
+        "realm" : "test",
+        "method" : "basic",
+        "consumers" : {
+          "userA" : "passwordA"
+        }
+      }
+    }
+  ],
+
+  "providers" : [
+    {
+      "context" : "/prov1",
+      "name" : "provider1",
+      "target" : "http://localhost:8080"
+    }
+  ]
+}

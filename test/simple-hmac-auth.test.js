@@ -1,18 +1,16 @@
-/* eslint no-unused-vars:0, no-unused-expressions:0 */
 "use strict";
 
-var path = require("path");
 var expect = require("chai").expect;
 var config = require("./fixtures/config-hmac-auth.json");
 var http = require("http");
 var clyde = require("../lib/clyde");
-var request = require("supertest");
 var Hmmac = require("hmmac");
-var hmmac = new Hmmac({ scheme: Hmmac.schemes.load("plain") });
+
 
 describe("simple-hmac-auth", function() {
 
   var server;
+  var hmmac = new Hmmac({ scheme: Hmmac.schemes.load("plain") });
 
   before(function(done) {
 

@@ -1,10 +1,9 @@
-/* eslint no-unused-vars:0, no-unused-expressions:0 */
+/* eslint no-unused-expressions:0 */
 "use strict";
 
 var path = require("path");
 var expect = require("chai").expect;
 var configuration = require("../lib/configuration");
-var InvalidConfiguration = require("../lib/errors/invalid-configuration");
 
 
 describe("simple-rate-limit", function() {
