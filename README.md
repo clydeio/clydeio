@@ -87,14 +87,14 @@ Create new filters is extremely simple (and most if you are a NodeJS developer w
 The `init()` method receives the `name` of the filter we have used in the configuration and the `configuration` options we have specified. It is up to you do whatever with the filter configuration and middleware.
 
 
-### Filters proposal
+# Filters proposal
 
+* Access log.
 * HMAC security.
 * API KEY security.
 * Rate limit.
 * Transformers. The private API can have methods with parameters we don't want to make public. The goal of this filter is to translate a public parameter/s to the corresponding private parameter/s, for example, translate from a public `date` param to a private `initialDate/finalDate` parameters.
 * Validators. Allows to limit the allowed requests, for example, supposing a `date` parameter we can limit the number of days we can query.
-* Loggin/Monitoring.
 
 
 # License
