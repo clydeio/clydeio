@@ -1,7 +1,6 @@
 # Simple Access log
 
-A [morgan](https://github.com/expressjs/morgan) based logger which stores 
-information into a log file for each request access.
+A [morgan](https://github.com/expressjs/morgan) based logger which stores information into a log file for each request access.
 
 
 ## Configuration
