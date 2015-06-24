@@ -15,6 +15,10 @@ describe("simple-hmac-auth", function() {
   var server;
 
   before(function(done) {
+
+    config.loglevel = "info";
+    config.logfile = "clyde.log";
+
     // Start clyde server with test configuration
     var clydeProxy = clyde.createProxyServer(config);
     server = http.createServer(clydeProxy);

@@ -20,8 +20,8 @@ var Hmmac = require("hmmac");
  *
  * @public
  * @param  {String} name Name of the filter
- * @param  {object} config JavaScript object with filter configuration
- * @returns {middleware} Middleware function implementing the filter.
+ * @param  {Object} config JavaScript object with filter configuration
+ * @returns {Function} Middleware function implementing the filter.
  */
 module.exports.init = function(name, config) {
 

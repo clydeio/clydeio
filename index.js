@@ -17,15 +17,13 @@
 "use strict";
 
 var http = require("http"),
-    options = require("../lib/cli-options"),
-    log = require("../lib/log"),
-    config = require(options.configfile),
-    clyde = require("../lib/clyde");
+    options = require("./lib/options"),
+    clyde = require("./lib/clyde");
 
 /**
  * Create proxy HTTP server.
  */
-var clydeProxy = clyde.createProxyServer(config);
+var clydeProxy = clyde.createProxyServer(options);
 var server = http.createServer(clydeProxy);
 
 
@@ -78,11 +76,11 @@ function onError(error) {
   // handle specific listen errors with friendly messages
   switch (error.code) {
     case "EACCES":
-      log.error(bind + " requires elevated privileges");
+      console.error(bind + " requires elevated privileges");
       process.exit(1);
       break;
     case "EADDRINUSE":
-      log.error(bind + " is already in use");
+      console.error(bind + " is already in use");
       process.exit(1);
       break;
     default:
@@ -100,5 +98,5 @@ function onListening() {
   var bind = typeof addr === "string"
     ? "pipe " + addr
     : "port " + addr.port;
-  log.info("Clyde is listening on " + bind);
+  console.info("Clyde is listening on " + bind);
 }
