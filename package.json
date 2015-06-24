@@ -3,7 +3,15 @@
   "name": "clyde",
   "homepage": "https://github.com/acanimal/clyde",
   "description": "Open source API management layer extremely flexible and configurable",
-  "keywords": ["clyde", "API", "management", "layer", "gateway", "middleware", "filter"],
+  "keywords": [
+    "clyde",
+    "API",
+    "management",
+    "layer",
+    "gateway",
+    "middleware",
+    "filter"
+  ],
   "version": "0.1.0",
   "repository": {
     "type": "git",
@@ -16,6 +24,7 @@
   "license": "MIT",
   "scripts": {
     "start": "node ./index.js",
+    "lint": "./node_modules/eslint/bin/eslint.js **/*.js",
     "test": "./node_modules/mocha/bin/mocha"
   },
   "engines": {
@@ -36,11 +45,9 @@
   },
   "devDependencies": {
     "chai": "^2.3.0",
-    "gulp": "~3.8.10",
-    "gulp-eslint": "^0.12.0",
-    "gulp-nodemon": "~2.0.2",
+    "eslint": "^0.23.0",
     "mocha": "^2.2.5",
-    "request-digest": "0.0.8",
+    "request": "^2.58.0",
     "supertest": "^1.0.1"
   }
 }
