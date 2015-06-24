@@ -36,7 +36,7 @@ module.exports.init = function(name, config) {
   }
   if (!config.method) {
     throw new Error("'simple-http-auth': An authentication method must be specified !!!");
-  } else if(config.method !== "basic" && config.method !== "digest") {
+  } else if (config.method !== "basic" && config.method !== "digest") {
     throw new Error("'simple-http-auth': Allowed authentication methods: 'basic' and 'digest'.");
   }
 

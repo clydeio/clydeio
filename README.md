@@ -91,8 +91,8 @@ The `init()` method receives the `name` of the filter we have used in the config
 
 * [Simple Access Log](filters/simple-access-log/). Stores request access information (like any HTTP server).
 * [Simple Rate limit](filters/simple-rate-limit/). Limits access globally, by consumer or by providers.
-* [Simple HMAC Authentication]. Authenticates consumers following HMAC security scheme.
-* [Simple HTTP authentication]. Authenticates consumers using basic or digest authentication methods.
+* [Simple HMAC Authentication](filters/simple-hmac-auth/). Authenticates consumers following HMAC security scheme.
+* [Simple HTTP authentication](filters/simple-http-auth/). Authenticates consumers using basic or digest authentication methods.
 
 
 ## Filters proposal

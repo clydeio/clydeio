@@ -1,13 +1,14 @@
-# Simple Basic Authentication
+# Simple HTTP Authentication
 
-A basic authentication filter based on [passport-http](https://github.com/jaredhanson/passport-http) module.
+A simple authentication filter for basic and digest methods. It is based on [passport-http](https://github.com/jaredhanson/passport-http) module.
 
 
 ## Configuration
 
 Accepts the configuration properties:
 
-* `realm`: A string that identified the authentication realm.
+* `realm`: A string that identifies the authentication realm.
+* `method`: Indicates the authenticated method to be used. It is a required property. Allowed values are `basic` and `digest`.
 * `consumers`: An object with the list of `user,password` pairs for each user.
 
 
@@ -15,15 +16,16 @@ Accepts the configuration properties:
 
 ### Configured as global prefilter
 
-All request to any provider will be stored:
+All requests are authenticated using basic auth:
 
     {
       "prefilters" : [
         {
-          "name" : "hmac-auth",
-          "path" : "./filters/simple-hmac-auth",
+          "name" : "basic-auth",
+          "path" : "./filters/simple-http-auth",
           "config" : {
             "realm" : "clyde",
+            "method" : "basic",
             "consumers" : {
               "userA" : "passwordA",
               ...
@@ -36,7 +38,7 @@ All request to any provider will be stored:
 
 ### Configured as provider prefilter
 
-Only the requests addresses to the provider will be stored
+Only the requests addresses to the provider are authenticated with digest method:
 
     {
       "providers" : [
@@ -46,10 +48,11 @@ Only the requests addresses to the provider will be stored
           "target" : "http://some_server",
           "prefilters" : [
             {
-              "name" : "hmac-auth",
-              "path" : "./filters/simple-hmac-auth",
+              "name" : "digest-auth",
+              "path" : "./filters/simple-http-auth",
               "config" : {
                 "realm" : "clyde",
+                "method" : "digest",
                 "consumers" : {
                   "userA" : "passwordA",
                   ...
