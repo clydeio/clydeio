@@ -11,13 +11,13 @@
       }
     },
     {
-      "name" : "basic-auth",
+      "name" : "digest-auth",
       "path" : "./filters/simple-http-auth",
       "config" : {
         "realm" : "clyde",
-        "method" : "basic",
+        "method" : "digest",
         "consumers" : {
-          "userA" : "passA"
+          "userA" : "passwordA"
         }
       }
     }
