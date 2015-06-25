@@ -17,43 +17,47 @@ Accepts the configuration properties:
 
 All request to any provider will be stored:
 
+```javascript
+{
+  "prefilters" : [
     {
+      "name" : "logger",
+      "path" : "./filters/simple-access-log",
+      "config" : {
+        "directory" : "./tmp/log",
+        "file" : "global-access-%DATE%.log"
+      }
+    }
+    ...
+  ]
+}
+```
+
+### Configured as provider prefilter
+
+Only the requests addresses to the provider will be stored
+
+```javascript
+{
+  "providers" : [
+    {
+      "context" : "/some_provider",
+      "name" : "some_provider",
+      "target" : "http://some_server",
       "prefilters" : [
         {
           "name" : "logger",
           "path" : "./filters/simple-access-log",
           "config" : {
             "directory" : "./tmp/log",
-            "file" : "global-access-%DATE%.log"
+            "file" : "some_provder-access-%DATE%.log"
           }
         }
-        ...
-      ]
-    }
-
-### Configured as provider prefilter
-
-Only the requests addresses to the provider will be stored
-
-    {
-      "providers" : [
-        {
-          "context" : "/some_provider",
-          "name" : "some_provider",
-          "target" : "http://some_server",
-          "prefilters" : [
-            {
-              "name" : "logger",
-              "path" : "./filters/simple-access-log",
-              "config" : {
-                "directory" : "./tmp/log",
-                "file" : "some_provder-access-%DATE%.log"
-              }
-            }
-        },
-        ...
-      ]
-    }
+    },
+    ...
+  ]
+}
+```
 
 
 ## Notes:

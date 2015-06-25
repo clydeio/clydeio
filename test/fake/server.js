@@ -1,5 +1,9 @@
 /**
  * Fake server implementation for testing.
+ *
+ * This script creates two servers, listening at ports 8890 and 8891, that acts 
+ * as two different APIs providers for Clyde testing.
+ * 
  */
 
 var restify = require('restify');

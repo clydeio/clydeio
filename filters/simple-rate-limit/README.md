@@ -30,77 +30,82 @@ At least one property must be specified, that is, at least `global`, `consumers`
 
 ### Limit global access to 100 req/sec
 
+```javascript
+{
+  "prefilters" : [
     {
-      "prefilters" : [
-        {
-          "name" : "rate-limit",
-          "path" : "./filters/simple-rate-limit",
-          "config" : {
+      "name" : "rate-limit",
+      "path" : "./filters/simple-rate-limit",
+      "config" : {
+        "global" : {
+          "tokens" : 100,
+          "interval" : "second"
+        },
+        ...
+      }
+    }
+    ...
+  ]
+}
+```
+
+### Limit access to a provider to 100 req/sec
+
+```javascript
+{
+  "prefilters" : [
+    {
+      "name" : "rate-limit",
+      "path" : "./filters/simple-rate-limit",
+      "config" : {
+        "providers" : {
+          "/some_provider" : {
+            "global" : {
+              "tokens" : 100,
+              "interval" : "second"
+            }
+          },
+          ...
+        },
+        ...
+      }
+    }
+    ...
+  ]
+}
+```
+
+### Limit access to a provider to 100 req/sec and to the `userA` consumer rate limited to 20 req/sec
+
+```javascript
+{
+  "prefilters" : [
+    {
+      "name" : "rate-limit",
+      "path" : "./filters/simple-rate-limit",
+      "config" : {
+        "providers" : {
+          "/some_provider" : {
             "global" : {
               "tokens" : 100,
               "interval" : "second"
             },
-            ...
-          }
-        }
+            "consumers" : {
+              "userA" : {
+                "tokens" : 20,
+                "interval" : "second"
+              }
+            } 
+          },
+          ...
+        },
         ...
-      ]
+      }
     }
-
-### Limit access to a provider to 100 req/sec
-
-    {
-      "prefilters" : [
-        {
-          "name" : "rate-limit",
-          "path" : "./filters/simple-rate-limit",
-          "config" : {
-            "providers" : {
-              "/some_provider" : {
-                "global" : {
-                  "tokens" : 100,
-                  "interval" : "second"
-                }
-              },
-              ...
-            },
-            ...
-          }
-        }
-        ...
-      ]
-    }
-
-
-### Limit access to a provider to 100 req/sec and to the `userA` consumer rate limited to 20 req/sec
-
-    {
-      "prefilters" : [
-        {
-          "name" : "rate-limit",
-          "path" : "./filters/simple-rate-limit",
-          "config" : {
-            "providers" : {
-              "/some_provider" : {
-                "global" : {
-                  "tokens" : 100,
-                  "interval" : "second"
-                },
-                "consumers" : {
-                  "userA" : {
-                    "tokens" : 20,
-                    "interval" : "second"
-                  }
-                } 
-              },
-              ...
-            },
-            ...
-          }
-        }
-        ...
-      ]
-    }
+    ...
+  ]
+}
+```
 
 ## Notes:
 

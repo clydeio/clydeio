@@ -1,3 +1,17 @@
+<!-- MarkdownTOC -->
+
+- CAUTION !!!
+- Clyde
+- Filters, Providers and Consumers
+- The data flow
+- Authentication
+- Custom filters
+- Available filters
+- Filters proposal
+- License
+
+<!-- /MarkdownTOC -->
+
 # CAUTION !!!
 
 Currently clyde is a proof of concept. It is unstable and in heavy development process to implement a first core version.
@@ -19,7 +33,7 @@ Clyde acts as a mediator (a man in the middle or a proxy) that allows to communi
 Clyde is modular and extremely configurable. Its core is responsible to read the configuration, load the required filters and connect them to be executed in the desired order. The real job is done by each filter: rate limiting, authentication, logging, etc.
 
 
-## Filters, Providers and Consumers
+# Filters, Providers and Consumers
 
 Clyde is based on three main concepts: filters, providers and consumers.
 
@@ -38,7 +52,7 @@ Within filters we can found two kind of filters: *prefilter* and *postfilters*.
 * **postfilters**: Filters designed to be executed after Clyde proxies the request to the provider (the private API) and allow to manipulate the response: adding headers, removing data, etc.
 
 
-## The data flow
+# The data flow
 
 The sequence of actions is explained in the next figure and goes as follows: 
 
@@ -54,7 +68,7 @@ The sequence of actions is explained in the next figure and goes as follows:
 This sequence allows maximum flexibility. The same filter can be set as global prefilter, provider's prefilter or global postfilter. It is up to you and, the possibilities of the filter, where to configure to be executed.
 
 
-## Authentication
+# Authentication
 
 You are free to implement custom filters following your own rules but, as many times, conventions are a good thing so everybody can work following the same patterns.
 
@@ -67,27 +81,29 @@ For this purpose, each time a request arrives to a *provider configuration zone*
 On the other hand and, as a convention, any module that authenticates users (the consumers) must add a `user` object to the `request` object with a property `userId`. This way, any subsequent filter that wants to make actions depending on the consumer can use `req.user.userId` to know the current user.
 
 
-## Custom filters
+# Custom filters
 
 Create new filters is extremely simple (and most if you are a NodeJS developer with experience on *connect* or *express*). We simply need to create a module that exports an `init(name , config)` method responsible to return a middleware function:
 
-    /**
-     * My custom filter.
-     * 
-     * @param  {String} name Name of the filter
-     * @param  {object} config JavaScript object with filter configuration
-     * @returns {middleware} Middleware function implementing the filter.
-     */
-    module.exports.init = function(name, config) {
-        return function(req, res, next) {
-            // Do whatever
-        };
+```javascript
+/**
+ + My custom filter.
+ + 
+ + @param  {String} name Name of the filter
+ + @param  {object} config JavaScript object with filter configuration
+ + @returns {middleware} Middleware function implementing the filter.
+ */
+module.exports.init = function(name, config) {
+    return function(req, res, next) {
+        // Do whatever
     };
+};
+```
 
 The `init()` method receives the `name` of the filter we have used in the configuration and the `configuration` options we have specified. It is up to you do whatever with the filter configuration and middleware.
 
 
-## Available filters
+# Available filters
 
 * [Simple Access Log](filters/simple-access-log/). Stores request access information (like any HTTP server).
 * [Simple Rate limit](filters/simple-rate-limit/). Limits access globally, by consumer or by providers.
@@ -96,7 +112,7 @@ The `init()` method receives the `name` of the filter we have used in the config
 * [CORS](filters/cors/). Enables Cross Origin Resource Sharing (CORS) whic allows AJAX requests.
 
 
-## Filters proposal
+# Filters proposal
 
 * API KEY security.
 * Transformers. The private API can have methods with parameters we don't want to make public. The goal of this filter is to translate a public parameter/s to the corresponding private parameter/s, for example, translate from a public `date` param to a private `initialDate/finalDate` parameters.
