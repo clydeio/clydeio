@@ -9,26 +9,15 @@
         "directory" : "./tmp/log",
         "file" : "access-pre-%DATE%.log"
       }
-    },
-    {
-      "name" : "digest-auth",
-      "path" : "./filters/simple-http-auth",
-      "config" : {
-        "realm" : "clyde",
-        "method" : "digest",
-        "consumers" : {
-          "userA" : "passwordA"
-        }
-      }
     }
   ],
 
   "_providers" : "Route to our private APIs",
   "providers" : [
     {
-      "context" : "/prov1",
-      "name" : "provider1",
-      "target" : "http://localhost:8080"
+      "context" : "/providerA",
+      "name" : "providerA",
+      "target" : "http://localhost:8890"
     },
     {
       "context" : "/prov2",
