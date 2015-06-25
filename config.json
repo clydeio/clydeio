@@ -1,13 +1,26 @@
 {
 
   "_prefilters" : "Global filters applied before any provider",
-  "prefilters" : [
+  "prefilters" : [    
     {
       "name" : "logger",
       "path" : "./filters/simple-access-log",
       "config" : {
         "directory" : "./tmp/log",
         "file" : "access-pre-%DATE%.log"
+      }
+    },
+    {
+      "name" : "cors",
+      "path" : "./filters/cors"
+    },
+    {
+      "name" : "hmac",
+      "path" : "./filters/simple-hmac-auth",
+      "config" : {
+        "consumers" : {
+          "keyA" : "secretA"
+        }
       }
     }
   ],
@@ -33,14 +46,7 @@
 
   "_postfilters" : "Global filters applied after any provider",
   "postfilters" : [
-    {
-      "name" : "postLogger",
-      "path" : "./filters/simple-access-log",
-      "config" : {
-        "directory" : "./tmp/log",
-        "file" : "access-post-%DATE%.log"
-      }
-    }
+    
   ]
 
 }
