@@ -117,7 +117,7 @@ The `init()` method receives the `name` of the filter we have used in the config
 * API KEY security.
 * Transformers. The private API can have methods with parameters we don't want to make public. The goal of this filter is to translate a public parameter/s to the corresponding private parameter/s, for example, translate from a public `date` param to a private `initialDate/finalDate` parameters.
 * Validators. Allows to limit the allowed requests, for example, supposing a `date` parameter we can limit the number of days we can query.
-* CORS filter. Allow access data from AJAX clients.
+* Body length limit: Limit the request body limit.
 * JSONP. Adapt responses to JSONP.
 
 
