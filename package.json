@@ -42,6 +42,7 @@
     "morgan": "^1.5.3",
     "passport": "^0.2.2",
     "passport-http": "^0.2.2",
+    "raw-body": "^2.1.1",
     "yargs": "^3.10.0"
   },
   "devDependencies": {

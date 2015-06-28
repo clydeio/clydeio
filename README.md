@@ -1,20 +1,23 @@
+# Table Of Contents
 <!-- MarkdownTOC -->
 
-- CAUTION !!!
-- Clyde
-- Filters, Providers and Consumers
-- The data flow
-- Authentication
-- Custom filters
-- Available filters
-- Filters proposal
-- License
+- [CAUTION !!!](#caution-)
+- [Clyde](#clyde)
+- [Filters, Providers and Consumers](#filters-providers-and-consumers)
+- [The data flow](#the-data-flow)
+- [Authentication](#authentication)
+- [Custom filters](#custom-filters)
+- [Available filters](#available-filters)
+- [Filters proposal](#filters-proposal)
+- [License](#license)
 
 <!-- /MarkdownTOC -->
 
+---
+
 # CAUTION !!!
 
-Currently clyde is a proof of concept. It is unstable and in heavy development process to implement a first core version.
+Currently Clyde is a proof of concept. It is unstable and in heavy development process to implement a first core version.
 
 ![Clyde the orangutan](http://www.wweek.com/portland/imgs/media.images/18764/movies_everywhich.widea.jpg)
 
@@ -106,10 +109,11 @@ The `init()` method receives the `name` of the filter we have used in the config
 # Available filters
 
 * [Simple Access Log](filters/simple-access-log/). Stores request access information (like any HTTP server).
-* [Simple Rate limit](filters/simple-rate-limit/). Limits access globally, by consumer or by providers.
+* [Simple Rate Limit](filters/simple-rate-limit/). Limits access globally, by consumer or by providers.
 * [Simple HMAC Authentication](filters/simple-hmac-auth/). Authenticates consumers following HMAC security scheme.
-* [Simple HTTP authentication](filters/simple-http-auth/). Authenticates consumers using basic or digest authentication methods.
+* [Simple HTTP Authentication](filters/simple-http-auth/). Authenticates consumers using basic or digest authentication methods.
 * [CORS](filters/cors/). Enables Cross Origin Resource Sharing (CORS) whic allows AJAX requests.
+* [Request Size Limit](filters/request-size-limit). Block requests depending on its body length.
 
 
 # Filters proposal
@@ -117,7 +121,6 @@ The `init()` method receives the `name` of the filter we have used in the config
 * API KEY security.
 * Transformers. The private API can have methods with parameters we don't want to make public. The goal of this filter is to translate a public parameter/s to the corresponding private parameter/s, for example, translate from a public `date` param to a private `initialDate/finalDate` parameters.
 * Validators. Allows to limit the allowed requests, for example, supposing a `date` parameter we can limit the number of days we can query.
-* Body length limit: Limit the request body limit.
 * JSONP. Adapt responses to JSONP.
 
 

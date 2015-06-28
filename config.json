@@ -13,19 +13,11 @@
     {
       "name" : "cors",
       "path" : "./filters/cors"
-    },
-    {
-      "name" : "hmac",
-      "path" : "./filters/simple-hmac-auth",
-      "config" : {
-        "consumers" : {
-          "keyA" : "secretA"
-        }
-      }
     }
   ],
 
-  "_providers" : "Route to our private APIs",
+
+  "_providers" : "Routes to our private APIs",
   "providers" : [
     {
       "context" : "/providerA",
@@ -33,16 +25,14 @@
       "target" : "http://localhost:8890"
     },
     {
-      "context" : "/prov2",
-      "name" : "provider2",
-      "target" : "http://localhost:5000",
-
-      "_prefilters" : "Local filters applied before proxy to provider",
+      "context" : "/providerB",
+      "name" : "providerB",
+      "target" : "http://localhost:8891",
       "prefilters" : [],
-      "_postfilters" : "Local filters applied after proxy to provider",
       "postfilters" : []
     }
   ],
+
 
   "_postfilters" : "Global filters applied after any provider",
   "postfilters" : [

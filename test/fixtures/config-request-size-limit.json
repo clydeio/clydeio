@@ -1,0 +1,20 @@
+{
+  "prefilters" : [
+    {
+      "name" : "request-size-limit",
+      "path" : "./filters/request-size-limit",
+      "config" : {
+        "limit" : "100b",
+        "length" : "5"
+      }
+    }
+  ],
+
+  "providers" : [
+    {
+      "context" : "/prov1",
+      "name" : "provider1",
+      "target" : "http://localhost:8080"
+    }
+  ]
+}
