@@ -3,12 +3,12 @@
 
 - [CAUTION !!!](#caution-)
 - [Clyde](#clyde)
-- [Filters, Providers and Consumers](#filters-providers-and-consumers)
-- [The data flow](#the-data-flow)
-- [Authentication](#authentication)
-- [Custom filters](#custom-filters)
+    - [Filters, Providers and Consumers](#filters-providers-and-consumers)
+    - [The data flow](#the-data-flow)
+    - [Authentication](#authentication)
+    - [Creating custom filters](#creating-custom-filters)
 - [Available filters](#available-filters)
-- [Filters proposal](#filters-proposal)
+    - [Filters proposal](#filters-proposal)
 - [License](#license)
 
 <!-- /MarkdownTOC -->
@@ -36,26 +36,26 @@ Clyde acts as a mediator (a man in the middle or a proxy) that allows to communi
 Clyde is modular and extremely configurable. Its core is responsible to read the configuration, load the required filters and connect them to be executed in the desired order. The real job is done by each filter: rate limiting, authentication, logging, etc.
 
 
-# Filters, Providers and Consumers
+## Filters, Providers and Consumers
 
-Clyde is based on three main concepts: filters, providers and consumers.
+Clyde is based on three main concepts: consumers, filters and providers.
 
-* **Producer**: A producer designates a private API we want to make public through Clyde. 
+- **Consumer**: A consumer is any client who access resources from an exposed provider, that is, that consumes an API.
+- **Filter**: A filter is any kind of *middleware* function that receives three parameters: the `request`, the `response` and a `next` function. It can then apply any rule (check, modify, validate, ...) both request or response.
+- **Producer**: A producer designates a private API we want to make public through Clyde and make accessible to consumers.
 
-* **Consumer**: A consumer is an identified client who consumes resources from an exposed provider, that is, that consumes an API.
+The concept of *filter* and how we set the execution order of them gives us a lot of flexibility.
 
-* **Filter**: A filter is any kind *middleware* function that receives three parameters: the `request`, the `response` and a `next` function. 
 
-Clyde core (and also many filters) is implemented using the [connect](https://github.com/senchalabs/connect) project, so the concept of middleware was inherited from it.
-
-Within filters we can found two kind of filters: *prefilter* and *postfilters*.
+Filters can be classified as *prefilter* or *postfilters* depending on the moment Clyde executes them, that is, before or after request is proxyed to the provider: 
 
 * **prefilters**: Those filters designed to be executed before Clyde proxies the request to the provider (the private API) and allow to manipulate the request: checking headers, changing query parameters, log request, etc.
 
 * **postfilters**: Filters designed to be executed after Clyde proxies the request to the provider (the private API) and allow to manipulate the response: adding headers, removing data, etc.
 
+> Note, Clyde core and also its filters are implemented using the [connect](https://github.com/senchalabs/connect) project, so the concept of middleware was inherited from it.
 
-# The data flow
+## The data flow
 
 The sequence of actions is explained in the next figure and goes as follows: 
 
@@ -68,10 +68,12 @@ The sequence of actions is explained in the next figure and goes as follows:
 
 ![The big picture](doc/dataflow.png)
 
-This sequence allows maximum flexibility. The same filter can be set as global prefilter, provider's prefilter or global postfilter. It is up to you and, the possibilities of the filter, where to configure to be executed.
+This sequence allows maximum flexibility. It is up to you decide which filters apply in which sequence of execution.
+
+Note we can create two filters of the same type (with a different configuration) and execute them at different places, for example, one access-log filter as global prefilter to log all requests (no matter the provider) and another access-log filter executed as a provider's prefilter to log the requests addressed to that concrete provider.
 
 
-# Authentication
+## Authentication
 
 You are free to implement custom filters following your own rules but, as many times, conventions are a good thing so everybody can work following the same patterns.
 
@@ -84,7 +86,7 @@ For this purpose, each time a request arrives to a *provider configuration zone*
 On the other hand and, as a convention, any module that authenticates users (the consumers) must add a `user` object to the `request` object with a property `userId`. This way, any subsequent filter that wants to make actions depending on the consumer can use `req.user.userId` to know the current user.
 
 
-# Custom filters
+## Creating custom filters
 
 Create new filters is extremely simple (and most if you are a NodeJS developer with experience on *connect* or *express*). We simply need to create a module that exports an `init(name , config)` method responsible to return a middleware function:
 
@@ -116,7 +118,7 @@ The `init()` method receives the `name` of the filter we have used in the config
 * [Request Size Limit](filters/request-size-limit). Block requests depending on its body length.
 
 
-# Filters proposal
+## Filters proposal
 
 * API KEY security.
 * Transformers. The private API can have methods with parameters we don't want to make public. The goal of this filter is to translate a public parameter/s to the corresponding private parameter/s, for example, translate from a public `date` param to a private `initialDate/finalDate` parameters.
