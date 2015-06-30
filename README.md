@@ -5,7 +5,7 @@
 - [Clyde](#clyde)
     - [Filters, Providers and Consumers](#filters-providers-and-consumers)
     - [The data flow](#the-data-flow)
-    - [Authentication](#authentication)
+    - [Authentication conventions](#authentication-conventions)
     - [Creating custom filters](#creating-custom-filters)
 - [Available filters](#available-filters)
     - [Filters proposal](#filters-proposal)
@@ -73,17 +73,36 @@ This sequence allows maximum flexibility. It is up to you decide which filters a
 Note we can create two filters of the same type (with a different configuration) and execute them at different places, for example, one access-log filter as global prefilter to log all requests (no matter the provider) and another access-log filter executed as a provider's prefilter to log the requests addressed to that concrete provider.
 
 
-## Authentication
+## Authentication conventions
 
 You are free to implement custom filters following your own rules but, as many times, conventions are a good thing so everybody can work following the same patterns.
 
 Plugins, like the *rate limiter* are flexible enough to be applied globally or specifically to limit the access of a given customer on a given provider. To achieve this, the filter need to know the provider the request is addressed and the consumer is making the request.
 
-For this purpose, each time a request arrives to a *provider configuration zone* (see picture) a new property `provider` is set within the middleware's `request` object with the *context* of the provider as value. Provider's context must be unique, so it is a good value to be used. This way, any filter that makes actions depending on the provider can use the `req.provider` property to know the provider.
-
 ![Provider's config](doc/provider_config.png)
 
-On the other hand and, as a convention, any module that authenticates users (the consumers) must add a `user` object to the `request` object with a property `userId`. This way, any subsequent filter that wants to make actions depending on the consumer can use `req.user.userId` to know the current user.
+For this purpose, each time a request arrives to a *provider configuration zone* (see picture) a new property `provider` is set within the middleware's `request` object with the next information about the provider:
+
+```javascript
+req.provider = {
+  providerId: 'some unique value',
+  context: '/some/context',
+  target: 'http://some_server:port'
+};
+```
+
+This way, any filter that makes actions depending on the provider information can use the `req.provider` property to know it.
+
+On the other hand and, as a convention, **any module that authenticates users (the consumers) must add a `user` object to the `request`** object and it is mandatory to contains at least a property `userId`:
+
+```javascript
+req.user = {
+  userId: 'some value',
+  ...
+};
+```
+
+This way, any subsequent filter that wants to make actions depending on the consumer can use `req.user.userId` to know the current user.
 
 
 ## Creating custom filters
