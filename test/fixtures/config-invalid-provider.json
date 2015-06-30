@@ -3,7 +3,7 @@
   "_comment" : "Bad provider config without required 'context' property",
   "providers" : [
     {
-      "name" : "provider name",
+      "id" : "provider id",
       "target" : "target URL",
       "prefilters" : [],
       "postfilters" : []

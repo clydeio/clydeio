@@ -11,18 +11,6 @@ var DigestStrategy = require("passport-http").DigestStrategy;
  * on passport-http.
  * Allowed configuration properties:
  *
- * @example
- * {
- *   "realm" : "clyde",
- *   "method" : "basic", // ["basic", "digest"]
- *   "consumers" : {
- *     "userA" : "passA"
- *   }
- * }
- *
- * Only the "consumers" property is required and must contains at least one
- * consumer.
- *
  * @public
  * @param  {String} name Name of the filter
  * @param  {object} config JavaScript object with filter configuration

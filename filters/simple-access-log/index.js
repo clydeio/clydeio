@@ -10,12 +10,6 @@ var morgan = require("morgan");
  * Simple access log implementation based on morgan. Allowed configuration
  * properties:
  *
- * @example
- * {
- *   "directory" : "./tmp/log",
- *   "file" : "access-%DATE%.log"
- * }
- *
  * @public
  * @param  {String} name Name of the filter
  * @param  {object} config JavaScript object with filter configuration

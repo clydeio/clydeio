@@ -55,11 +55,11 @@ describe("simple-rate-limit", function() {
 
     // Configuration allows 1 call per second, so first call must be fine and
     // the second must fail.
-    rateLimit.middleware({provider: "/providerA"}, {}, function(err) {
+    rateLimit.middleware({provider: { context: "/providerA" }}, {}, function(err) {
       expect(err).to.be.undefined;
     });
 
-    rateLimit.middleware({provider: "/providerA"}, {}, function(err) {
+    rateLimit.middleware({provider: { context: "/providerA" }}, {}, function(err) {
       expect(err.name).to.be.equal("RateLimitExceeded");
     });
   });
@@ -72,11 +72,11 @@ describe("simple-rate-limit", function() {
 
     // Configuration allows 1 call per second, so first call must be fine and
     // the second must fail.
-    rateLimit.middleware({provider: "/providerA", user: {userId: "userA"}}, {}, function(err) {
+    rateLimit.middleware({provider: { context: "/providerA" }, user: {userId: "userA"}}, {}, function(err) {
       expect(err).to.be.undefined;
     });
 
-    rateLimit.middleware({provider: "/providerA", user: {userId: "userA"}}, {}, function(err) {
+    rateLimit.middleware({provider: { context: "/providerA" }, user: {userId: "userA"}}, {}, function(err) {
       expect(err.name).to.be.equal("RateLimitExceeded");
     });
   });

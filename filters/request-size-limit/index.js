@@ -5,11 +5,6 @@ var getRawBody = require('raw-body');
 /**
  * Blocks requests depending on its body's length.
  *
- * @example
- * {
- *   "limit" : "100b"
- * }
- *
  * @public
  * @param  {String} name Name of the filter
  * @param  {Object} config JavaScript object with filter configuration

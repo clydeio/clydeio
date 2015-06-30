@@ -2,8 +2,8 @@
 
   "providers" : [
     {
+      "id" : "id",
       "context" : "context",
-      "name" : "name",
       "target" : "target",
       "prefilters" : [],
       "postfilters" : []

@@ -3,7 +3,7 @@
   "providers" : [
     {
       "context" : "context",
-      "name" : "name",
+      "id" : "id",
       "target" : "target",
       "prefilters" : [],
       "postfilters" : []
@@ -12,7 +12,7 @@
 
   "postfilters" : [
     {
-      "name" : "test filter",
+      "id" : "test filter",
       "path" : "./stubs/filter.js",
       "config" : {}
     }

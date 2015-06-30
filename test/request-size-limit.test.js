@@ -1,10 +1,10 @@
 "use strict";
 
-var expect = require("chai").expect;
 var config = require("./fixtures/config-request-size-limit.json");
 var http = require("http");
 var clyde = require("../lib/clyde");
 var request = require("supertest");
+
 
 describe("request-size-limit", function() {
 

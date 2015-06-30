@@ -34,7 +34,7 @@ At least one property must be specified, that is, at least `global`, `consumers`
 {
   "prefilters" : [
     {
-      "name" : "rate-limit",
+      "id" : "rate-limit",
       "path" : "./filters/simple-rate-limit",
       "config" : {
         "global" : {
@@ -55,7 +55,7 @@ At least one property must be specified, that is, at least `global`, `consumers`
 {
   "prefilters" : [
     {
-      "name" : "rate-limit",
+      "id" : "rate-limit",
       "path" : "./filters/simple-rate-limit",
       "config" : {
         "providers" : {
@@ -81,7 +81,7 @@ At least one property must be specified, that is, at least `global`, `consumers`
 {
   "prefilters" : [
     {
-      "name" : "rate-limit",
+      "id" : "rate-limit",
       "path" : "./filters/simple-rate-limit",
       "config" : {
         "providers" : {

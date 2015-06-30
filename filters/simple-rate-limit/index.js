@@ -285,39 +285,6 @@ function applyProviderConsumerLimit(providersLimiters, providerId, consumerId, c
  * Limits can be applied globally, on a concrete provider, on a concrete
  * consumer or on a concrete provider's consumer.
  *
- * Allowed configuration properties:
- *
- * @example
- * {
- *   "global" : {
- *     "tokens" : 150,
- *     "interval" : "hour"
- *   },
- *
- *   "consumers" : {
- *     "userA" : {
- *       "tokens" : 150,
- *       "interval" : "hour"
- *     }
- *   },
- *
- *   "providers" : {
- *     "providerA" : {
- *       "global" : {
- *         "tokens" : 150,
- *         "interval" : "hour"
- *       },
- *
- *       "consumers" : {
- *         "userA" : {
- *           "tokens" : 150,
- *           "interval" : "hour"
- *         }
- *       }
- *     }
- *   }
- * }
- *
  * @public
  * @param  {String} name Name of the filter
  * @param  {object} config JavaScript object with filter configuration
@@ -334,8 +301,10 @@ module.exports.init = function(name, config) {
   // Return middleware function that applies rates limits
   return function(req, res, next) {
 
-    var consumerId,
-        providerId = req.provider;
+    var consumerId, providerId;
+    if (req.provider && req.provider.context) {
+      providerId = req.provider.context;
+    }
     if (req.user && req.user.userId) {
       consumerId = req.user.userId;
     }

@@ -22,7 +22,7 @@ All requests are authenticated using basic auth:
 {
   "prefilters" : [
     {
-      "name" : "basic-auth",
+      "id" : "basic-auth",
       "path" : "./filters/simple-http-auth",
       "config" : {
         "realm" : "clyde",
@@ -46,12 +46,12 @@ Only the requests addresses to the provider are authenticated with digest method
 {
   "providers" : [
     {
+      "id" : "some_provider",
       "context" : "/some_provider",
-      "name" : "some_provider",
       "target" : "http://some_server",
       "prefilters" : [
         {
-          "name" : "digest-auth",
+          "id" : "digest-auth",
           "path" : "./filters/simple-http-auth",
           "config" : {
             "realm" : "clyde",

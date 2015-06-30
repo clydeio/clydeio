@@ -7,17 +7,6 @@ var Hmmac = require("hmmac");
  * Simple plain HMAC authentication implementation based on hmmac package.
  * Allowed configuration properties:
  *
- * @example
- * {
- *   "realm" : "clyde",
- *   "consumers" : {
- *     "keyA" : "secretA"
- *   }
- * }
- *
- * Only the "consumers" property is required and must contains at least one
- * consumer.
- *
  * @public
  * @param  {String} name Name of the filter
  * @param  {Object} config JavaScript object with filter configuration
@@ -56,6 +45,10 @@ module.exports.init = function(name, config) {
   // Custom responder function.
   function customResponder(valid, req, res, next) {
     if (valid === true) {
+      // Attach user information to the request (like passport strategies)
+      req.user = {
+        userId: '' // TODO - Get key reference
+      }
       return next();
     } else {
       res.statusCode = 401;

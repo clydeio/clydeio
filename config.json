@@ -3,7 +3,7 @@
   "_prefilters" : "Global filters applied before any provider",
   "prefilters" : [    
     {
-      "name" : "logger",
+      "id" : "logger",
       "path" : "./filters/simple-access-log",
       "config" : {
         "directory" : "./tmp/log",
@@ -11,7 +11,7 @@
       }
     },
     {
-      "name" : "cors",
+      "id" : "cors",
       "path" : "./filters/cors"
     }
   ],
@@ -19,14 +19,14 @@
 
   "_providers" : "Routes to our private APIs",
   "providers" : [
-    {
+    {      
+      "id" : "providerA",
       "context" : "/providerA",
-      "name" : "providerA",
       "target" : "http://localhost:8890"
     },
     {
-      "context" : "/providerB",
-      "name" : "providerB",
+      "id" : "providerB",
+      "context" : "/providerB",      
       "target" : "http://localhost:8891",
       "prefilters" : [],
       "postfilters" : []

@@ -21,7 +21,7 @@ All request to any provider will be stored:
 {
   "prefilters" : [
     {
-      "name" : "logger",
+      "id" : "logger",
       "path" : "./filters/simple-access-log",
       "config" : {
         "directory" : "./tmp/log",
@@ -41,12 +41,12 @@ Only the requests addresses to the provider will be stored
 {
   "providers" : [
     {
+      "id" : "some_provider",
       "context" : "/some_provider",
-      "name" : "some_provider",
       "target" : "http://some_server",
       "prefilters" : [
         {
-          "name" : "logger",
+          "id" : "logger",
           "path" : "./filters/simple-access-log",
           "config" : {
             "directory" : "./tmp/log",

@@ -18,7 +18,7 @@ The filter inherits options from `raw-body` module:
 {
   "prefilters" : [
     {
-      "name" : "request-size-limit",
+      "id" : "request-size-limit",
       "path" : "./filters/request-size-limit",
       "config" : {
         "limit" : "100b"
@@ -35,7 +35,7 @@ The filter inherits options from `raw-body` module:
 {
   "prefilters" : [
     {
-      "name" : "request-size-limit",
+      "id" : "request-size-limit",
       "path" : "./filters/request-size-limit",
       "config" : {
         "length" : 1024

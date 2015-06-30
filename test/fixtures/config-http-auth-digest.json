@@ -1,7 +1,7 @@
 {
   "prefilters" : [
     {
-      "name" : "digest-auth",
+      "id" : "digest-auth",
       "path" : "./filters/simple-http-auth",
       "config" : {
         "realm" : "test",
@@ -15,8 +15,8 @@
 
   "providers" : [
     {
+      "id" : "provider1",
       "context" : "/prov1",
-      "name" : "provider1",
       "target" : "http://localhost:8080"
     }
   ]

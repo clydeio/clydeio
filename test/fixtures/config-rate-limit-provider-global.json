@@ -1,7 +1,7 @@
 {
   "prefilters" : [
     {
-      "name" : "rate-limit",
+      "id" : "rate-limit",
       "path" : "./filters/simple-rate-limit",
       "config" : {
         
@@ -20,8 +20,8 @@
 
   "providers" : [
     {
+      "id" : "provider1",
       "context" : "/providerA",
-      "name" : "provider1",
       "target" : "http://localhost:8080"
     }
   ]

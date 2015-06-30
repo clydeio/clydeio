@@ -1,7 +1,7 @@
 {
   "prefilters" : [
     {
-      "name" : "test filter",
+      "id" : "test filter",
       "path" : "./stubs/filter.js",
       "config" : {}
     }
@@ -9,8 +9,8 @@
 
   "providers" : [
     {
+      "id" : "id",
       "context" : "context",
-      "name" : "name",
       "target" : "target",
       "prefilters" : [],
       "postfilters" : []

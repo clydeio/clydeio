@@ -1,5 +1,5 @@
 {
-  "_comment" : "Invalid prefilter without required 'name' property",
+  "_comment" : "Invalid prefilter without required 'id' property",
   "prefilters" : [
     {
       "path" : "path to filter source",
@@ -10,7 +10,7 @@
   "providers" : [
     {
       "context" : "context",
-      "name" : "name",
+      "id" : "unique id",
       "target" : "target",
       "prefilters" : [],
       "postfilters" : []
