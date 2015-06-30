@@ -52,7 +52,7 @@ module.exports.init = function(name, config) {
         var consumerPassword = config.consumers[userid];
         if (password === consumerPassword) {
           return done(null, {
-            username: userid,
+            userid: userid,
             password: password
           });
         }
@@ -72,7 +72,7 @@ module.exports.init = function(name, config) {
         var consumerPassword = config.consumers[username];
         if (consumerPassword) {
           return done(null, {
-            username: username,
+            userid: username,
             password: consumerPassword
           }, consumerPassword);
         }
