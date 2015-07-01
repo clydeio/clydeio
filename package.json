@@ -17,7 +17,7 @@
     "type": "git",
     "url": "git://github.com/acanimal/clyde.git"
   },
-  "main": "index.js",
+  "main": ".lib/clyde.js",
   "directories": {
     "lib": "./lib"
   },

@@ -9,8 +9,8 @@
 
   "providers" : [
     {
-      "context" : "context",
       "id" : "unique id",
+      "context" : "context",
       "target" : "target",
       "prefilters" : [],
       "postfilters" : []

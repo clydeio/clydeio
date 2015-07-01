@@ -9,10 +9,6 @@
         "directory" : "./tmp/log",
         "file" : "access-pre-%DATE%.log"
       }
-    },
-    {
-      "id" : "cors",
-      "path" : "./filters/cors"
     }
   ],
 
@@ -22,7 +18,13 @@
     {      
       "id" : "providerA",
       "context" : "/providerA",
-      "target" : "http://localhost:8890"
+      "target" : "http://localhost:8890",
+      "prefilters" : [
+        {
+          "id" : "cors",
+          "path" : "./filters/cors"
+        }
+      ]
     },
     {
       "id" : "providerB",
