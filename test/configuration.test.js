@@ -6,32 +6,6 @@ var expect = require("chai").expect;
 var configuration = require("../lib/configuration");
 var InvalidConfiguration = require("../lib/errors/invalid-configuration");
 
-// {
-//   "prefilters": [
-//     {
-//       "id": "logger",
-//       "path": "./filters/simple-access-log",
-//       "config": {
-//         "directory": "./tmp/log",
-//         "file": "access-pre-%DATE%.log"
-//       }
-//     }
-//   ],
-//   "providers": [
-//     {
-//       "id": "providerA",
-//       "context": "/providerA",
-//       "target": "http://localhost:8890",
-//       "prefilters": [
-//         {
-//           "id": "cors",
-//           "path": "./filters/cors"
-//         }
-//       ]
-//     }
-//   ],
-//   "postfilters": []
-// }
 
 describe("configuration", function() {
 
