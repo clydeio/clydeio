@@ -1,18 +1,41 @@
 /* eslint no-unused-vars:0 */
 "use strict";
 
+var path = require("path");
 var expect = require("chai").expect;
 var configuration = require("../lib/configuration");
 var InvalidConfiguration = require("../lib/errors/invalid-configuration");
 
+// {
+//   "prefilters": [
+//     {
+//       "id": "logger",
+//       "path": "./filters/simple-access-log",
+//       "config": {
+//         "directory": "./tmp/log",
+//         "file": "access-pre-%DATE%.log"
+//       }
+//     }
+//   ],
+//   "providers": [
+//     {
+//       "id": "providerA",
+//       "context": "/providerA",
+//       "target": "http://localhost:8890",
+//       "prefilters": [
+//         {
+//           "id": "cors",
+//           "path": "./filters/cors"
+//         }
+//       ]
+//     }
+//   ],
+//   "postfilters": []
+// }
 
 describe("configuration", function() {
 
-  before(function() {
-    configuration.base(__dirname);
-  });
-
-  it("should return error because invalid configuration object", function() {
+  it("should fail because invalid configuration object", function() {
     try {
       var config = configuration.load("not a config object");
     } catch(err) {
@@ -21,7 +44,7 @@ describe("configuration", function() {
     }
   });
 
-  it("should return error because at least one provider must be specified", function() {
+  it("should fail because at least one provider must be specified", function() {
     try {
       var config = configuration.load({});
     } catch(err) {
@@ -30,51 +53,156 @@ describe("configuration", function() {
     }
   });
 
-  it("should return error because invalid prefilter specified", function() {
-    var configJS = require("./fixtures/config-invalid-prefilter.json");
+  it("should fail because provider has no 'id'", function() {
+    var options = {
+      providers: [
+        {
+          context: "/provider",
+          target: "http://server:port"
+        }
+      ]
+    };
 
     try {
-      var config = configuration.load(configJS);
-    } catch(err) {
-      expect(err).to.be.instanceof(InvalidConfiguration);
-      expect(err.message).to.be.equal(InvalidConfiguration.INVALID_FILTER_MESSAGE);
-    }
-  });
-
-  it("should return a configuration with one prefilter", function() {
-    var configJS = require("./fixtures/config-one-prefilter.json");
-
-    var config = configuration.load(configJS);
-    expect(config.prefilters).to.have.length(1);
-  });
-
-  it("should return a configuration with one postfilter", function() {
-    var configJS = require("./fixtures/config-one-postfilter.json");
-
-    var config = configuration.load(configJS);
-    expect(config.postfilters).to.have.length(1);
-  });
-
-  it("should return error because invalid provider specified", function() {
-    var configJS = require("./fixtures/config-invalid-provider.json");
-
-    try {
-      var config = configuration.load(configJS);
+      var config = configuration.load(options);
     } catch(err) {
       expect(err).to.be.instanceof(InvalidConfiguration);
       expect(err.message).to.be.equal(InvalidConfiguration.INVALID_PROVIDER_MESSAGE);
     }
   });
 
-  it("should return a configuration with a providers array property with one provider", function() {
-    var configJS = require("./fixtures/config-one-provider-no-filter.json");
+  it("should fail because provider has no 'target'", function() {
+    var options = {
+      providers: [
+        {
+          id: "id",
+          context: "/provider"
+        }
+      ]
+    };
 
-    var config = configuration.load(configJS);
+    try {
+      var config = configuration.load(options);
+    } catch(err) {
+      expect(err).to.be.instanceof(InvalidConfiguration);
+      expect(err.message).to.be.equal(InvalidConfiguration.INVALID_PROVIDER_MESSAGE);
+    }
+  });
+
+  it("should fail because provider has no 'host' neither 'context'", function() {
+    var options = {
+      providers: [
+        {
+          id: "id",
+          target: "http://server:port"
+        }
+      ]
+    };
+
+    try {
+      var config = configuration.load(options);
+    } catch(err) {
+      expect(err).to.be.instanceof(InvalidConfiguration);
+      expect(err.message).to.be.equal(InvalidConfiguration.INVALID_PROVIDER_MESSAGE);
+    }
+  });
+
+  it("should success loading provider configuration", function() {
+    var options = {
+      providers: [
+        {
+          id: "id",
+          host: "www.host.com",
+          target: "http://server:port"
+        }
+      ]
+    };
+
+    var config = configuration.load(options);
     expect(Object.keys(config.providers).length).to.be.equal(1);
-    expect(config.context).to.be.equal(configJS.context);
-    expect(config.name).to.be.equal(configJS.name);
-    expect(config.target).to.be.equal(configJS.target);
+    expect(config.id).to.be.equal(options.id);
+    expect(config.host).to.be.equal(options.host);
+    expect(config.context).to.be.equal(options.context);
+    expect(config.target).to.be.equal(options.target);
     expect(config.prefilters).to.have.length(0);
+    expect(config.postfilters).to.have.length(0);
+  });
+
+  it("should fail because filter has no 'id'", function() {
+    var options = {
+      prefilters: [
+        {
+          path: "some_dir"
+        }
+      ],
+      providers: [
+        {
+          id: "id",
+          context: "/provider",
+          target: "http://server:port"
+        }
+      ]
+    };
+
+    try {
+      var config = configuration.load(options);
+    } catch(err) {
+      expect(err).to.be.instanceof(InvalidConfiguration);
+      expect(err.message).to.be.equal(InvalidConfiguration.INVALID_FILTER_MESSAGE);
+    }
+  });
+
+  it("should fail because filter has no 'path'", function() {
+    var options = {
+      prefilters: [
+        {
+          id: "id"
+        }
+      ],
+      providers: [
+        {
+          id: "id",
+          context: "/provider",
+          target: "http://server:port"
+        }
+      ]
+    };
+
+    try {
+      var config = configuration.load(options);
+    } catch(err) {
+      expect(err).to.be.instanceof(InvalidConfiguration);
+      expect(err.message).to.be.equal(InvalidConfiguration.INVALID_FILTER_MESSAGE);
+    }
+  });
+
+  it("should success loading prefilter configuration", function() {
+    var options = {
+      prefilters: [
+        {
+          id: "id",
+          path: "../test/stubs/filter.js"
+        }
+      ],
+      providers: [
+        {
+          id: "id",
+          context: "/provider",
+          target: "http://server:port"
+        }
+      ]
+    };
+
+    var config = configuration.load(options);
+    expect(Object.keys(config.providers).length).to.be.equal(1);
+    expect(config.id).to.be.equal(options.id);
+    expect(config.host).to.be.equal(options.host);
+    expect(config.context).to.be.equal(options.context);
+    expect(config.target).to.be.equal(options.target);
+    expect(config.prefilters).to.have.length(1);
+    expect(config.prefilters[0].id).to.be.equal(options.prefilters[0].id);
+    // Configuration converts path to absolute so we need to compare to an absolute path.
+    expect(config.prefilters[0].path).to.be.equal(path.join(__dirname, "..", "filter", options.prefilters[0].path));
     expect(config.postfilters).to.have.length(0);
   });
 
