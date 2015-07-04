@@ -1,10 +1,10 @@
 /* eslint no-unused-vars:0 */
 "use strict";
 
-var path = require("path");
-var expect = require("chai").expect;
-var configuration = require("../lib/configuration");
-var InvalidConfiguration = require("../lib/errors/invalid-configuration");
+var path = require("path"),
+    expect = require("chai").expect,
+    configuration = require("../lib/configuration"),
+    InvalidConfiguration = require("../lib/errors/invalid-configuration");
 
 
 describe("configuration", function() {
@@ -63,7 +63,7 @@ describe("configuration", function() {
     }
   });
 
-  it("should fail because provider has no 'host' neither 'context'", function() {
+  it("should fail because provider has no context'", function() {
     var options = {
       providers: [
         {
@@ -86,7 +86,7 @@ describe("configuration", function() {
       providers: [
         {
           id: "id",
-          host: "www.host.com",
+          context: "/path",
           target: "http://server:port"
         }
       ]
@@ -95,7 +95,6 @@ describe("configuration", function() {
     var config = configuration.load(options);
     expect(Object.keys(config.providers).length).to.be.equal(1);
     expect(config.id).to.be.equal(options.id);
-    expect(config.host).to.be.equal(options.host);
     expect(config.context).to.be.equal(options.context);
     expect(config.target).to.be.equal(options.target);
     expect(config.prefilters).to.have.length(0);
@@ -170,7 +169,6 @@ describe("configuration", function() {
     var config = configuration.load(options);
     expect(Object.keys(config.providers).length).to.be.equal(1);
     expect(config.id).to.be.equal(options.id);
-    expect(config.host).to.be.equal(options.host);
     expect(config.context).to.be.equal(options.context);
     expect(config.target).to.be.equal(options.target);
     expect(config.prefilters).to.have.length(1);

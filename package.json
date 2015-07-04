@@ -23,7 +23,7 @@
   },
   "license": "MIT",
   "scripts": {
-    "start": "node ./index.js",
+    "start": "node ./bin/index.js",
     "lint": "./node_modules/eslint/bin/eslint.js **/*.js",
     "test": "./node_modules/mocha/bin/mocha test/**/*.test.js"
   },
@@ -49,6 +49,7 @@
     "chai": "^2.3.0",
     "eslint": "^0.23.0",
     "mocha": "^2.2.5",
+    "nock": "^2.7.0",
     "request": "^2.58.0",
     "restify": "^3.0.3",
     "supertest": "^1.0.1"
