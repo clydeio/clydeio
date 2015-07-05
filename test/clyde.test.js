@@ -3,12 +3,11 @@
 
 var path = require("path"),
     expect = require("chai").expect,
+    request = require("supertest"),
+    nock = require("nock"),
     http = require("http"),
     clyde = require("../lib/clyde"),
     NoProviderFound = require("../lib/errors/no-provider-found.js");
-
-var request = require("supertest");
-var nock = require("nock");
 
 
 describe("clyde", function() {
