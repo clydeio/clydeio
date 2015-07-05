@@ -55,8 +55,8 @@ describe("clyde", function() {
       providers: [
         {
           id: "id",
-          context: "/provider",
-          target: "http://server:port"
+          context: "/providerA",
+          target: "http://serverA"
         }
       ]
     };
@@ -66,16 +66,14 @@ describe("clyde", function() {
     server = http.createServer(middleware);
     server.listen(options.port);
 
-    // Mock request to provider
-    nock("http://localhost:8888")
-      .get("/provider")
-      .reply(200, {
-        msg: "hi"
-      });
+    // Mock provider's request
+    nock("http://serverA")
+      .get("/")
+      .reply(200, { msg: "hi" });
 
     // Make request
     request("http://localhost:8888")
-      .get("/provider")
+      .get("/providerA")
       .expect(200, {msg: "hi"}, done);
   });
 
