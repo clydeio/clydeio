@@ -1,9 +1,6 @@
-/* eslint no-unused-vars:0 */
 "use strict";
 
-var path = require("path"),
-    expect = require("chai").expect,
-    request = require("supertest"),
+var request = require("supertest"),
     nock = require("nock"),
     http = require("http"),
     clyde = require("../lib/clyde"),
