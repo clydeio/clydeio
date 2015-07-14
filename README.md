@@ -212,15 +212,19 @@ Clyde can also be used as a middleware. You can create your own HTTP server, con
 
 * Install Clyde as an npm dependency of your application.
 * Require the `clyde` module.
-	```javascript
-	var clyde = require("clyde");
-	```
+
+```javascript
+var clyde = require("clyde");
+```
+
 * Create a Clyde middleware (initialized with desired options):
-	```javascript
-	var middleware = clyde.createMiddleware(options);
-	```
+
+```javascript
+var middleware = clyde.createMiddleware(options);
+```
 
 At this point we can create a HTTP server using `middleware` as the request listener function:
+
 ```javascript
 var server = http.createServer(middleware);
 server.listen(9999);
