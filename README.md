@@ -22,7 +22,8 @@ Clyde allows to concentrate on the implementation of our API business logic, lea
 		- [Consumer](#consumer)
 		- [Filter](#filter)
 	- [The data flow](#the-data-flow)
-	- [Authentication conventions](#authentication-conventions)
+	- [Conventions](#conventions)
+		- [Provider](#provider)
 	- [Creating custom filters](#creating-custom-filters)
 - [Using Clyde](#using-clyde)
 	- [Standalone Application](#standalone-application)
@@ -102,15 +103,19 @@ As we can see, working with global/provider prefilter/postfilters give us maximu
 Note a filter is designed to make an action and it is up to you decide at which place to execute. This way, we can configure two filters, of the same type  but with different options, and execute them at different places. For example, one *access log* filter as global prefilter to log all requests (no matter the provider) and another *access log*  filter executed as a provider's prefilter to log only the requests addressed to that concrete provider.
 
 
-## Authentication conventions
+## Conventions
 
 You are free to implement custom filters following your own rules but, as many times, conventions are a good thing so everybody can work following the same patterns.
 
-Plugins, like the *rate limiter* are flexible enough to be applied globally or specifically to limit the access of a given customer on a given provider. To achieve this, the filter need to know the provider the request is addressed and the consumer is making the request.
+### Provider
+
+Some plugins, like a *rate limiter*, could be flexible enough to be applied on a given provider. For example, we can limit the number of requests/second a provider can reveice, that is, the number of request/seconf Clyde can redirect to a provider.
+
+To achieve this, the filter needs to know a bit about the provider the request is addressed. For this purpose, each time a request enters in the *provider configuration zone* (see picture) a new property `provider` is set within the middleware's `request` object.
 
 ![Provider's config](doc/provider_config.png)
 
-For this purpose, each time a request arrives to a *provider configuration zone* (see picture) a new property `provider` is set within the middleware's `request` object with the next information about the provider:
+The `req.provider` object contains at least the next properties:
 
 ```javascript
 req.provider = {
@@ -120,9 +125,17 @@ req.provider = {
 };
 ```
 
-This way, any filter that makes actions depending on the provider information can use the `req.provider` property to know it.
+This way, any filter that makes actions depending on the provider information can use the `req.provider` property to know about it.
 
-On the other hand and, as a convention, **any module that authenticates users (the consumers) must add a `user` object to the `request`** object and it is mandatory to contains at least a property `userId`:
+### Authentication (*Consumers* information)
+
+In the same way and, continue using a supposed *rate limiter* filter, it could be flexible enough to limit the request/second a user, that is a consumer, can make on a given provider.
+
+Clyde follows the convention that **any module that authenticates consumers (the users) must add a `user` object to the `request` object**:
+
+![Authentication config](doc/auth_config.png)
+
+The `req.user` object must contains at least a property `userId`:
 
 ```javascript
 req.user = {
@@ -133,22 +146,26 @@ req.user = {
 
 This way, any subsequent filter that wants to make actions depending on the consumer can use `req.user.userId` to know the current user.
 
+> Some authentication filters uses the [passport](https://github.com/jaredhanson/passport) module, which adds `req.user` to the request. We simply follow the same convention.
+
 
 ## Creating custom filters
 
-Create new filters is extremely simple (and most if you are a NodeJS developer with experience on *connect* or *express*). We simply need to create a module that exports an `init(name , config)` method responsible to return a middleware function:
+Create new filters is extremely simple (and more if you are a NodeJS developer with some experience using *connect* or *express*).
+
+A filter requires to create a module that exports an `init(name , config)` method responsible to return a middleware function:
 
 ```javascript
 /**
  + My custom filter.
  +
  + @param  {String} name Name of the filter
- + @param  {object} config JavaScript object with filter configuration
+ + @param  {Object} config JavaScript object with filter configuration
  + @returns {middleware} Middleware function implementing the filter.
  */
 module.exports.init = function(name, config) {
     return function(req, res, next) {
-        // Do whatever
+        // Do whatever. I'm a filter !!!
     };
 };
 ```
@@ -159,13 +176,15 @@ The `init()` method receives the `name` of the filter we have used in the config
 
 # Using Clyde
 
-Clyde can be used both standalone application or as a middleware.
+Clyde can be used as standalone application or as a middleware.
 
 ## Standalone Application
 
-To use Clyde standalone you need to download it and execute the `bin/index.js` script.
+To use Clyde as standalone application you need to execute the `bin/index.js` script.
 
 > Check the `bin/index.js` script has execution permissions or execute it using `> node bin/index.js` otherwise.
+
+The `bin/index.js` script requires one parameter that must be the JSON configuration file to be used to configure Clyde.
 
 Run `bin/index.js --help` to run the usage options of the program:
 
@@ -188,7 +207,25 @@ Examples:
 
 ## Middleware
 
-We can also use Clyde in our own application using as a middleware:
+Clyde can also be used as a middleware. You can create your own HTTP server, connect or express application and pass Clyde middleware as request listener or middleware. To do so you must:
+
+* Install Clyde as an npm dependency of your application.
+* Require the `clyde` module.
+	```javascript
+	var clyde = require("clyde");
+	```
+* Create a Clyde middleware (initialized with desired options):
+	```javascript
+	var middleware = clyde.createMiddleware(options);
+	```
+
+At this point we can create a HTTP server using `middleware` as the request listener function:
+```javascript
+var server = http.createServer(middleware);
+server.listen(9999);
+```
+
+or create a connect or express application and use it:
 
 TODO - Continue ...
 
