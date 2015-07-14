@@ -36,6 +36,12 @@ Clyde acts as a mediator (a man in the middle or a proxy) that allows to communi
 Clyde is modular and extremely configurable. Its core is responsible to read the configuration, load the required filters and connect them to be executed in the desired order. The real job is done by each filter: rate limiting, authentication, logging, etc.
 
 
+## How to use Clyde?
+
+Clyde can be used both standalone or as a middleware.
+
+TODO - Continue documenting.
+
 ## Filters, Providers and Consumers
 
 Clyde is based on three main concepts: consumers, filters and providers.
@@ -129,12 +135,12 @@ The `init()` method receives the `name` of the filter we have used in the config
 
 # Available filters
 
-* [Simple Access Log](filters/simple-access-log/). Stores request access information (like any HTTP server).
-* [Simple Rate Limit](filters/simple-rate-limit/). Limits access globally, by consumer or by providers.
-* [Simple HMAC Authentication](filters/simple-hmac-auth/). Authenticates consumers following HMAC security scheme.
-* [Simple HTTP Authentication](filters/simple-http-auth/). Authenticates consumers using basic or digest authentication methods.
-* [CORS](filters/cors/). Enables Cross Origin Resource Sharing (CORS) whic allows AJAX requests.
-* [Request Size Limit](filters/request-size-limit). Block requests depending on its body length.
+* [Simple Access Log](https://github.com/acanimal/clyde-simple-access-log). Stores request access information (like any HTTP server).
+* [Simple Rate Limit](https://github.com/acanimal/clyde-simple-rate-limiter). Limits access globally, by consumer or by providers.
+* [Simple HMAC Authentication](https://github.com/acanimal/clyde-hmac-auth). Authenticates consumers following HMAC security scheme.
+* [Simple HTTP Authentication](https://github.com/acanimal/clyde-simple-http-auth). Authenticates consumers using basic or digest authentication methods.
+* [CORS](https://github.com/acanimal/clyde-cors). Enables Cross Origin Resource Sharing (CORS) whic allows AJAX requests.
+* [Request Size Limit](https://github.com/acanimal/clyde-request-size-limiter). Block requests depending on its body length.
 
 
 ## Filters proposal
