@@ -24,6 +24,7 @@ Clyde allows to concentrate on the implementation of our API business logic, lea
 	- [The data flow](#the-data-flow)
 	- [Conventions](#conventions)
 		- [Provider](#provider)
+		- [Authentication](#authentication)
 	- [Creating custom filters](#creating-custom-filters)
 - [Using Clyde](#using-clyde)
 	- [Standalone Application](#standalone-application)
@@ -127,7 +128,7 @@ req.provider = {
 
 This way, any filter that makes actions depending on the provider information can use the `req.provider` property to know about it.
 
-### Authentication (*Consumers* information)
+### Authentication
 
 In the same way and, continue using a supposed *rate limiter* filter, it could be flexible enough to limit the request/second a user, that is a consumer, can make on a given provider.
 
