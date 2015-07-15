@@ -6,7 +6,7 @@ When developing an API the most important part resides on designing and implemen
 
 Clyde allows to concentrate on the implementation of our API business logic, leaving the rest of work to Clyde.
 
-> ### Warning !!!
+> **Disclaimer !!!**
 >
 > Clyde is currently a proof of concept. It is unstable and in heavy development process to implement a first core version.
 >
@@ -28,16 +28,18 @@ Clyde allows to concentrate on the implementation of our API business logic, lea
 	- [Creating custom filters](#creating-custom-filters)
 - [Using Clyde](#using-clyde)
 	- [Standalone Application](#standalone-application)
-	- [Middleware](#middleware)
+	- [Connection listener (or middleware)](#connection-listener-or-middleware)
 - [Configuration](#configuration)
+	- [Filter object](#filter-object)
+	- [Provider object](#provider-object)
 - [Available filters](#available-filters)
 	- [Filters proposal](#filters-proposal)
 - [License](#license)
 <!-- /TOC -->
 
-> **Note:** Impressed by the [Kong](http://getkong.org/) project and by the need to protect a private API I started *Clyde* project. I choose the Clyde name because it is, like Kong, the name of one of the most famous movie apes.
-
 # Introducing Clyde
+
+> **Note:** Impressed by the [Kong](http://getkong.org/) project and by the need to protect a private API I started *Clyde* project. I choose Clyde name because it is, like Kong, the name of one of the most famous movie apes.
 
 Clyde is an API gateway, which means it receives requests and redirects to the right API implementation meanwhile applies any number of so called *filter* before and/or after redirecting the request.
 
@@ -160,11 +162,11 @@ A filter requires to create a module that exports an `init(name , config)` metho
 /**
  + My custom filter.
  +
- + @param  {String} name Name of the filter
+ + @param  {String} id Identifier of the filter
  + @param  {Object} config JavaScript object with filter configuration
  + @returns {middleware} Middleware function implementing the filter.
  */
-module.exports.init = function(name, config) {
+module.exports.init = function(id, config) {
     return function(req, res, next) {
         // Do whatever. I'm a filter !!!
     };
@@ -177,7 +179,7 @@ The `init()` method receives the `name` of the filter we have used in the config
 
 # Using Clyde
 
-Clyde can be used as standalone application or as a middleware.
+Clyde can be used as standalone application or as a connection listener (or middleware).
 
 ## Standalone Application
 
@@ -206,38 +208,64 @@ Examples:
 
 > Note, `logfile` and `loglevel` can also be specified in the configuration file but are overridden by the command line options if present.
 
-## Middleware
+## Connection listener (or middleware)
 
-Clyde can also be used as a middleware. You can create your own HTTP server, connect or express application and pass Clyde middleware as request listener or middleware. To do so you must:
+Clyde can also be used as a connection listener, in an HTTP/S server, or as a middleware on an express or connect based applications. To do so you must:
 
 * Install Clyde as an npm dependency of your application.
 * Require the `clyde` module.
+* Create a Clyde middleware (initialized with desired options) with `createMiddleware()` method:
 
 ```javascript
 var clyde = require("clyde");
-```
-
-* Create a Clyde middleware (initialized with desired options):
-
-```javascript
+var options = {
+  // Configuration options
+};
 var middleware = clyde.createMiddleware(options);
 ```
 
-At this point we can create a HTTP server using `middleware` as the request listener function:
+The `createMiddleware()` method returns a function with the signature `function(req, res, next) {...}` that can be used both as a connection listener or as middleware. So, at this point we can create a HTTP server using the `middleware` variable:
 
 ```javascript
 var server = http.createServer(middleware);
 server.listen(9999);
 ```
 
-or create a connect or express application and use it:
-
-TODO - Continue ...
-
-
 # Configuration
 
-TODO - Continue ...
+The goal of the configuration options is to define the flow data must follow through the global prefilters, the provider's confiruation zone and the global postfilters.
+
+As standalone application Clyde requires specify the configuration in a JSON file. As a connection listener it requires a JavaScript object. In both cases the allower structure and properties are the same.
+
+The configuration options are:
+
+* `prefilters`: An array of *filter objects* that will be executed as global prefilters. Optional property.
+* `postfilters`: An array of *filter objects* that will be executed as global postfilters. Optional property.
+* `providers`: An array of *provider objects* with the configuration need to route a request to approppriate private API. It is the only mandatory property and must contain at least one provider configuration.
+* `logfile`: Path to the log file. Optional property. Default 'clyde.log'.
+* `loglevel`: Level used for clyde log messages. Optional property. Default 'info'.
+
+> As standalone application, `logfile` and `loglevel` can be specified on command line. In that case command line values override values specified in the configuration file.
+
+## Filter object
+
+A filter object contains information need so Clyde can load and execute a given filter. The allowed properties are:
+
+* `id`: String identifying the filter among all other filters. It is a mandatory property.
+* `path`: Path need to load the filter module. It is a mandatory property. Modules are loaded using `require()`. Paths starting with a dot `.` will be loaded relatively to the `$CLYDE/filters` directory. Otherwise modules are loaded following node rules. For example: `path: "some_filter"` will try to load the module from the `node_modules` directory.
+* `config`: An object with the filter configuration properties. The allowed properties depends on each filter. Optional property.
+
+> When filters are initialized, `id` and `config` properties are passed to the filter's exported method `init(id, config)`.
+
+## Provider object
+
+For each private API we desire to make publicly available we must configure a provider object. The allowed properties are:
+
+* `id`: String identifying the provider among all other providers. It is a mandatory property.
+* `context`: The path part (from the beginning) that is used to discriminate the private API we want to route the request.
+* `target`: The address where to proxy the requests that follows the previous `context`.
+* `prefilters`: An array of *filter objects* that will be executed as global prefilters. Optional property.
+* `postfilters`: An array of *filter objects* that will be executed as global postfilters. Optional property.
 
 
 # Available filters
