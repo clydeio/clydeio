@@ -32,10 +32,10 @@ Clyde allows to concentrate on the implementation of our API business logic, lea
 - [Configuration](#configuration)
 	- [Filter object](#filter-object)
 	- [Provider object](#provider-object)
+	- [Configuration example](#configuration-example)
 - [Available filters](#available-filters)
 	- [Filters proposal](#filters-proposal)
 - [License](#license)
-
 <!-- /TOC -->
 
 # Introducing Clyde
