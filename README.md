@@ -268,6 +268,65 @@ For each private API we desire to make publicly available we must configure a pr
 * `prefilters`: An array of *filter objects* that will be executed as global prefilters. Optional property.
 * `postfilters`: An array of *filter objects* that will be executed as global postfilters. Optional property.
 
+## Configuration example
+
+Next we show a sample JSON configuration that allows Clyde to redirect request to two private APIs, which resides at `http://providerA:8080` and `http://providerB:8080`.
+
+Clyde is working with `loglevel` at `debug` level, which means we will see messages each time a request enters or exits a filter or is redirected to a provider.
+
+A global prefilter is configured to log each request that arrives to Clyde server, which are stored at `./tmp/log` directory following the pattern `access-%DATE%.log`.
+
+All the requests that follows the patter `http://clyde_server/A/*` are redirected to the *providerA*. In addition this provider has configured a CORS filters, which allows to make XHR request from a borwser.
+
+On the other side, all requests that follows the pattern `http://clyde_server/B/*` are redirected to the *providerB*. This provider has configured an HTTP authentication prefilter, which means all requests must have authentication attached. The authentication filter is configured to work using basic authentication method and only one user is allowed to pass, the `userA`.
+
+```json
+{
+	"loglevel" : "debug",
+  "prefilters" : [
+    {
+      "id" : "logger",
+      "path" : "simple-access-log",
+      "config" : {
+        "directory" : "./tmp/log",
+        "file" : "access-%DATE%.log"
+      }
+    }
+  ],
+
+  "providers" : [
+    {
+      "id" : "providerA",
+      "context" : "/A",
+      "target" : "http://providerA:8080",
+      "prefilters" : [
+        {
+          "id" : "cors",
+          "path" : "cors"
+        }
+      ]
+    },
+    {
+      "id" : "providerB",
+      "context" : "/B",
+      "target" : "http://providerB:8080",
+      "prefilters" : [
+				{
+          "id": "http-auth",
+          "path": "simple-http-auth",
+          "config": {
+            "realm": "providerB",
+            "method": "basic",
+            "consumers": {
+              "userA": "passwordA"
+            }
+          }
+        }
+			]
+    }
+  ]
+}
+```
 
 # Available filters
 
