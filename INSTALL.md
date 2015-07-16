@@ -16,4 +16,9 @@ To work with Clyde as a standalone application you need to:
 
 ## Run Clyde
 
-Within the Clyde directory execute `./bin/index.js config.json`.
+Within the Clyde directory execute the next command and see the message:
+
+```
+> ./bin/index.js config.json
+Clyde is listening on port 8000
+```

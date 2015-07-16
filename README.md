@@ -36,6 +36,7 @@ Clyde allows to concentrate on the implementation of our API business logic, lea
 - [Available filters](#available-filters)
 	- [Filters proposal](#filters-proposal)
 - [License](#license)
+
 <!-- /TOC -->
 
 # Introducing Clyde
@@ -286,7 +287,7 @@ On the other side, all requests that follows the pattern `http://clyde_server/B/
   "prefilters" : [
     {
       "id" : "logger",
-      "path" : "simple-access-log",
+      "path" : "clyde-simple-access-log",
       "config" : {
         "directory" : "./tmp/log",
         "file" : "access-%DATE%.log"
@@ -302,7 +303,7 @@ On the other side, all requests that follows the pattern `http://clyde_server/B/
       "prefilters" : [
         {
           "id" : "cors",
-          "path" : "cors"
+          "path" : "clyde-cors"
         }
       ]
     },
@@ -313,7 +314,7 @@ On the other side, all requests that follows the pattern `http://clyde_server/B/
       "prefilters" : [
 				{
           "id": "http-auth",
-          "path": "simple-http-auth",
+          "path": "clyde-simple-http-auth",
           "config": {
             "realm": "providerB",
             "method": "basic",
