@@ -3,6 +3,7 @@
 var request = require("supertest"),
     nock = require("nock"),
     http = require("http"),
+    fs = require("fs"),
     clyde = require("../lib/clyde"),
     NoProviderFound = require("../lib/errors/no-provider-found.js");
 
@@ -73,5 +74,39 @@ describe("clyde", function() {
       .expect(200, {msg: "hi"}, done);
   });
 
+  it("should apply default log properties", function(done) {
+    var options = {
+      port: 8888,
+      providers: [
+        {
+          id: "id",
+          context: "/providerA",
+          target: "http://serverA"
+        }
+      ]
+    };
+
+    // Create server with clyde's middleware options
+    var middleware = clyde.createMiddleware(options);
+    server = http.createServer(middleware);
+    server.listen(options.port);
+
+    // Mock provider's request
+    nock("http://serverA")
+      .get("/")
+      .reply(200, { msg: "hi" });
+
+    // Make request
+    request("http://localhost:8888")
+      .get("/providerA")
+      .expect(200, {msg: "hi"});
+
+    if(fs.existsSync("clyde.log")) {
+      done();
+    } else {
+      done(new Error("Log file does not exists"));
+    }
+
+  });
 
 });

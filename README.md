@@ -1,3 +1,6 @@
+
+<img src="doc/orangutan.png" alt="Orangutan" height="100"/>
+
 # Clyde
 
 Clyde is an open source NodeJS based API gateway.
@@ -36,7 +39,6 @@ Clyde allows to concentrate on the implementation of our API business logic, lea
 - [Available filters](#available-filters)
 	- [Filters proposal](#filters-proposal)
 - [License](#license)
-
 <!-- /TOC -->
 
 # Introducing Clyde
