@@ -1,8 +1,8 @@
 {
   "author": "Antonio Santiago <asantiagop@gmail.com> (http://acuriousanimal.com/blog)",
-  "name": "clyde",
+  "name": "clydeio",
   "homepage": "https://github.com/acanimal/clyde",
-  "description": "Open source API management layer extremely flexible and configurable",
+  "description": "Open source API gateway and management layer. Modular, extremely flexible and configurable.",
   "keywords": [
     "clyde",
     "API",
