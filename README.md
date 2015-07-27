@@ -1,5 +1,3 @@
-> Development branch adding resources configuration to providers
-
 <img src="doc/orangutan.png" alt="Orangutan" height="100"/>
 
 # Clyde
