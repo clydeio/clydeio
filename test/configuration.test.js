@@ -57,6 +57,7 @@ describe("configuration", function() {
     try {
       configuration.load(options);
     } catch(err) {
+      console.log(err);
       expect(err).to.be.instanceof(InvalidConfiguration);
       expect(err.message).to.contains(InvalidConfiguration.INVALID_PROVIDER_MESSAGE);
     }
