@@ -13,7 +13,7 @@ describe("configuration", function() {
       configuration.load("not a config object");
     } catch(err) {
       expect(err).to.be.instanceof(InvalidConfiguration);
-      expect(err.message).to.be.equal(InvalidConfiguration.EMPTY_MESSAGE);
+      expect(err.message).to.contains(InvalidConfiguration.EMPTY_MESSAGE);
     }
   });
 
@@ -22,7 +22,7 @@ describe("configuration", function() {
       configuration.load({});
     } catch(err) {
       expect(err).to.be.instanceof(InvalidConfiguration);
-      expect(err.message).to.be.equal(InvalidConfiguration.NO_PROVIDER_MESSAGE);
+      expect(err.message).to.contains(InvalidConfiguration.NO_PROVIDER_MESSAGE);
     }
   });
 
@@ -40,7 +40,7 @@ describe("configuration", function() {
       configuration.load(options);
     } catch(err) {
       expect(err).to.be.instanceof(InvalidConfiguration);
-      expect(err.message).to.be.equal(InvalidConfiguration.INVALID_PROVIDER_MESSAGE);
+      expect(err.message).to.contains(InvalidConfiguration.INVALID_PROVIDER_MESSAGE);
     }
   });
 
@@ -58,7 +58,7 @@ describe("configuration", function() {
       configuration.load(options);
     } catch(err) {
       expect(err).to.be.instanceof(InvalidConfiguration);
-      expect(err.message).to.be.equal(InvalidConfiguration.INVALID_PROVIDER_MESSAGE);
+      expect(err.message).to.contains(InvalidConfiguration.INVALID_PROVIDER_MESSAGE);
     }
   });
 
@@ -76,7 +76,7 @@ describe("configuration", function() {
       configuration.load(options);
     } catch(err) {
       expect(err).to.be.instanceof(InvalidConfiguration);
-      expect(err.message).to.be.equal(InvalidConfiguration.INVALID_PROVIDER_MESSAGE);
+      expect(err.message).to.contains(InvalidConfiguration.INVALID_PROVIDER_MESSAGE);
     }
   });
 
@@ -120,7 +120,7 @@ describe("configuration", function() {
       configuration.load(options);
     } catch(err) {
       expect(err).to.be.instanceof(InvalidConfiguration);
-      expect(err.message).to.be.equal(InvalidConfiguration.INVALID_FILTER_MESSAGE);
+      expect(err.message).to.contains(InvalidConfiguration.INVALID_FILTER_MESSAGE);
     }
   });
 
@@ -144,7 +144,7 @@ describe("configuration", function() {
       configuration.load(options);
     } catch(err) {
       expect(err).to.be.instanceof(InvalidConfiguration);
-      expect(err.message).to.be.equal(InvalidConfiguration.INVALID_FILTER_MESSAGE);
+      expect(err.message).to.contains(InvalidConfiguration.INVALID_FILTER_MESSAGE);
     }
   });
 
