@@ -101,7 +101,7 @@ describe("clyde", function() {
       .get("/providerA")
       .expect(200, {msg: "hi"});
 
-    if(fs.existsSync("clyde.log")) {
+    if (fs.existsSync("clyde.log")) {
       done();
     } else {
       done(new Error("Log file does not exists"));
