@@ -86,12 +86,13 @@ Filters can be classified depending on the moment Clyde executes them, that is, 
 
 * **postfilters**: Filters designed to be executed after Clyde proxies the request to the provider (the private API) and allow to manipulate the response: adding headers, removing data, etc.
 
-In addition, we can also classify filters as *global* or *provider* filter, depending on if they affect the whole set of configured providers (*global*) or only affect a concrete provider:
+Clyde gives flexibility enough to configure filter to be executed globally, per provider or per provider's resource. We can classify them as:
 
-* **global pre/postfilter**: Those filters applied outside the so called *providers configuration zone*.
+* **global pre/postfilter**: filters applied outside the so called *providers configuration zone* and affect any request.
 
-* **provider pre/postfilter**: Those filters applied inside the so called *providers configuratin zone*.
+* **provider pre/postfilter**: filters applied inside the so called *providers configuratin zone* and only affect those request on a given provider.
 
+* **resource pre/postfilter**: filters applied on a given provider's resource, in the way, they only affect those requests addressed to a given resource of a provider.
 
 ## The data flow
 
@@ -102,11 +103,13 @@ The next figure summarizes the steps a request follows each time arrives to Clyd
 * Request passes through each *global prefilter* in the same order they are configured.
 * Request is redirected to the right provider and enters the *providers configuration zone*.
 * Request passes through each *provider's prefilter* in the same order they are configured.
+* If the request matches any *provider's resource* the resource prefilters are applied.
 * Request is proxied to the private API.
+* If the request matches any *provider's resource* the resource postfilters are applied.
 * Request passes through each *provider's postfilter* in the same order they are configured.
 * Request passes through each *global postfilter* in the same order they are configured.
 
-As we can see, working with global/provider prefilter/postfilters give us maximum flexibility to implement any possible configuration.
+As we can see, working with global/provider/resource prefilter/postfilters give us maximum flexibility to implement any possible configuration.
 
 Note a filter is designed to make an action and it is up to you decide at which place to execute. This way, we can configure two filters, of the same type  but with different options, and execute them at different places. For example, one *access log* filter as global prefilter to log all requests (no matter the provider) and another *access log*  filter executed as a provider's prefilter to log only the requests addressed to that concrete provider.
 
@@ -271,6 +274,16 @@ For each private API we desire to make publicly available we must configure a pr
 * `target`: The address where to proxy the requests that follows the previous `context`.
 * `prefilters`: An array of *filter objects* that will be executed as global prefilters. Optional property.
 * `postfilters`: An array of *filter objects* that will be executed as global postfilters. Optional property.
+* `resources`: An array of *resource objects* that will be executed depending on its `context` property.
+
+## Resource object
+
+A resource represents a concrete resource or operation within a private API. We can use it to specify concrete filters to be applied per resource.
+
+* `id`: String identifying the resource among all provier's resources. It is a mandatory property.
+* `context`: The path part (after the provider's `context`) that is used to discriminate the resource of the private API we want to apply filers.
+* `prefilters`: An array of *filter objects* that will be executed on the resource. Optional property.
+* `postfilters`: An array of *filter objects* that will be executed on the resource. Optional property.
 
 ## Configuration example
 

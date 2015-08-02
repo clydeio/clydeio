@@ -101,7 +101,7 @@ describe("clyde", function() {
       .get("/providerA")
       .expect(200, {msg: "hi"});
 
-    if(fs.existsSync("clyde.log")) {
+    if (fs.existsSync("clyde.log")) {
       done();
     } else {
       done(new Error("Log file does not exists"));
@@ -110,6 +110,7 @@ describe("clyde", function() {
   });
 
   it("should success requesting a provider's resource", function(done) {
+
     var options = {
       port: 8888,
       logfile: "clyde.log",
@@ -121,7 +122,14 @@ describe("clyde", function() {
           target: "http://serverA",
           resources: [
             {
-              context: "/resource1"
+              id: "idResource1",
+              context: "/resource1",
+              prefilters: [
+                {
+                  id: "f1",
+                  path: "../test/stubs/filter.js"
+                }
+              ]
             }
           ]
         }
@@ -142,6 +150,7 @@ describe("clyde", function() {
     request("http://localhost:8888")
       .get("/providerA/resource1")
       .expect(200, {msg: "hi"}, done);
+
   });
 
 });
