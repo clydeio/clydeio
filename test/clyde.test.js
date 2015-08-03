@@ -126,7 +126,13 @@ describe("clyde", function() {
               context: "/resource1",
               prefilters: [
                 {
-                  id: "f1",
+                  id: "pref1",
+                  path: "../test/stubs/filter.js"
+                }
+              ],
+              postfilters: [
+                {
+                  id: "postf1",
                   path: "../test/stubs/filter.js"
                 }
               ]
