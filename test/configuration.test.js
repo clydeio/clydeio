@@ -177,4 +177,76 @@ describe("configuration", function() {
     expect(config.postfilters).to.have.length(0);
   });
 
+  it("should fail because provider's resource has no 'id'", function() {
+    var options = {
+      providers: [
+        {
+          id: "id",
+          context: "/provider",
+          target: "http://server:port",
+          resources: [
+            {
+              context: "/resource"
+            }
+          ]
+        }
+      ]
+    };
+
+    try {
+      configuration.load(options);
+    } catch(err) {
+      expect(err).to.be.instanceof(InvalidConfiguration);
+      expect(err.message).to.contains(InvalidConfiguration.INVALID_RESOURCE_MESSAGE);
+    }
+  });
+
+  it("should fail because provider's resource has no 'context'", function() {
+    var options = {
+      providers: [
+        {
+          id: "id",
+          context: "/provider",
+          target: "http://server:port",
+          resources: [
+            {
+              id: "idResource"
+            }
+          ]
+        }
+      ]
+    };
+
+    try {
+      configuration.load(options);
+    } catch(err) {
+      expect(err).to.be.instanceof(InvalidConfiguration);
+      expect(err.message).to.contains(InvalidConfiguration.INVALID_RESOURCE_MESSAGE);
+    }
+  });
+
+  it("should success loading a provider with resource", function() {
+    var options = {
+      providers: [
+        {
+          id: "id",
+          context: "/provider",
+          target: "http://server:port",
+          resources: [
+            {
+              id: "idResource",
+              context: "/context"
+            }
+          ]
+        }
+      ]
+    };
+
+    var config = configuration.load(options);
+    expect(Object.keys(config.providers).length).to.be.equal(1);
+    expect(config.providers[0].resources).to.have.length(1);
+    expect(config.providers[0].resources[0].id).to.be.equal("idResource");
+    expect(config.providers[0].resources[0].context).to.be.equal("/context");
+  });
+
 });

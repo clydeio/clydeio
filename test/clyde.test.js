@@ -109,4 +109,54 @@ describe("clyde", function() {
 
   });
 
+  it("should success requesting a provider's resource", function(done) {
+
+    var options = {
+      port: 8888,
+      logfile: "clyde.log",
+      loglevel: "info",
+      providers: [
+        {
+          id: "id",
+          context: "/providerA",
+          target: "http://serverA",
+          resources: [
+            {
+              id: "idResource1",
+              context: "/resource1",
+              prefilters: [
+                {
+                  id: "pref1",
+                  path: "../test/stubs/filter.js"
+                }
+              ],
+              postfilters: [
+                {
+                  id: "postf1",
+                  path: "../test/stubs/filter.js"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    };
+
+    // Create server with clyde's middleware options
+    var middleware = clyde.createMiddleware(options);
+    server = http.createServer(middleware);
+    server.listen(options.port);
+
+    // Mock provider's request
+    nock("http://serverA")
+      .get("/resource1")
+      .reply(200, { msg: "hi" });
+
+    // Make request
+    request("http://localhost:8888")
+      .get("/providerA/resource1")
+      .expect(200, {msg: "hi"}, done);
+
+  });
+
 });
