@@ -1,7 +1,7 @@
 {
   "author": "Antonio Santiago <asantiagop@gmail.com> (http://acuriousanimal.com/blog)",
   "name": "clydeio",
-  "homepage": "https://github.com/acanimal/clyde",
+  "homepage": "https://github.com/clydeio/clyde",
   "description": "Open source API gateway and management layer. Modular, extremely flexible and configurable.",
   "keywords": [
     "clyde",
@@ -15,7 +15,7 @@
   "version": "0.2.1",
   "repository": {
     "type": "git",
-    "url": "git://github.com/acanimal/clyde.git"
+    "url": "https://github.com/clydeio/clyde.git"
   },
   "main": "./lib/clyde.js",
   "directories": {
