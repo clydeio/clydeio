@@ -4,7 +4,7 @@
 
 Clyde is an API gateway, which means it receives requests and redirects to the right API implementation meanwhile applies any number of so called *filter* before and/or after redirecting the request.
 
-![Clyde](doc/img/clyde.png)
+![Clyde](img/clyde.png)
 
 The power of Clyde resides in the way it manages the filters, making it extremely modular and configurable.
 
@@ -54,7 +54,7 @@ Clyde gives flexibility enough to configure filter to be executed globally, per 
 
 The next figure summarizes the steps a request follows each time arrives to Clyde gateway.
 
-![The big picture](doc/img/dataflow.png)
+![The big picture](img/dataflow.png)
 
 * Request passes through each *global prefilter* in the same order they are configured.
 * Request is redirected to the right provider and enters the *providers configuration zone*.
@@ -80,7 +80,7 @@ Some plugins, like a *rate limiter*, could be flexible enough to be applied on a
 
 To achieve this, the filter needs to know a bit about the provider the request is addressed. For this purpose, each time a request enters in the *provider configuration zone* (see picture) a new property `provider` is set within the middleware's `request` object.
 
-![Provider's config](doc/img/provider_config.png)
+![Provider's config](img/provider_config.png)
 
 The `req.provider` object contains at least the next properties:
 
@@ -100,7 +100,7 @@ In the same way and, continue using a supposed *rate limiter* filter, it could b
 
 Clyde follows the convention that **any module that authenticates consumers (the users) must add a `user` object to the `request` object**:
 
-![Authentication config](doc/img/auth_config.png)
+![Authentication config](img/auth_config.png)
 
 The `req.user` object must contains at least a property `userId`:
 
