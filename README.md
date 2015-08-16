@@ -1,8 +1,8 @@
-<img src="doc/img/logo.png" alt="logo"/>
-
 # Clyde
 
 Clyde is an open source NodeJS based API gateway.
+
+![logo](https://github.com/clydeio/clyde/wiki/img/logo.png)
 
 When developing an API the most important part resides on designing and implementing the business logic and operations. This is true but we know real life projects requires also many other things that can become defiant challenges: logging, authentication, rate limiting, etc.
 
