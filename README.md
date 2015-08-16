@@ -16,7 +16,7 @@ Clyde allows to concentrate on the implementation of our API business logic, lea
 
 # Documentation
 
-See the `doc` folder to learn more about ClydeIO.
+Read the [wiki](https://github.com/clydeio/clyde/wiki) section to learn more about ClydeIO.
 
 # License
 
