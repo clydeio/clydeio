@@ -1,3 +1,18 @@
+<!-- TOC depth:6 withLinks:1 updateOnSave:1 orderedList:0 -->
+
+- [Introducing Clyde](#introducing-clyde)
+	- [Concepts](#concepts)
+		- [Provider (or Private API)](#provider-or-private-api)
+		- [Public API](#public-api)
+		- [Consumer](#consumer)
+		- [Filter](#filter)
+	- [The data flow](#the-data-flow)
+	- [Conventions](#conventions)
+		- [Provider](#provider)
+		- [Authentication](#authentication)
+	- [Creating custom filters](#creating-custom-filters)
+<!-- /TOC -->
+
 # Introducing Clyde
 
 > **Note:** Impressed by the [Kong](http://getkong.org/) project and by the need to protect a private API I started *Clyde* project. I choose Clyde name because it is, like Kong, the name of one of the most famous movie apes.
