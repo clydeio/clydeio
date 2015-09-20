@@ -1,33 +1,36 @@
 "use strict";
 
-var repository = require("../lib/domain/memory-repository"),
-    server = require("../lib/app/server"),
+var repository = require("../lib/butler/memory-repository"),
+    butlerServer = require("../lib/butler/server"),
     expect = require("chai").expect,
     request = require("supertest");
 
-describe.skip("routes (memory repository backend)", function() {
 
-  var serv;
+describe("routes (memory backend)", function() {
+
+  var server;
 
   before(function() {
     var opts = {
       port: 9999,
       repository: repository
     };
-    serv = server.startServer(opts);
+    server = butlerServer.startServer(opts);
   });
 
   after(function() {
-    serv.close();
+    server.close();
   });
 
-  describe("providers", function() {
 
-    var providerId; // eslint-disable-line no-unused-vars
+  //
+  // Consumers
+  //
+  describe("consumers", function() {
 
-    it("should get an emtpy providers array", function(done) {
+    it("'[GET] /consumers' should get an emtpy consumers array", function(done) {
       request("http://localhost:9999")
-        .get("/providers")
+        .get("/consumers")
         .set("Accept", "application/json")
         .expect("Content-Type", "application/json; charset=utf-8")
         .expect(200)
@@ -38,18 +41,60 @@ describe.skip("routes (memory repository backend)", function() {
         .end(done);
     });
 
-    it("fail getting a providers with non existent 'id'", function(done) {
+    it("'[GET] /consumers/notexists' fails with 404 due consumer not exists", function(done) {
       request("http://localhost:9999")
-        .get("/providers/notexists")
+        .get("/consumers/notexists")
         .set("Accept", "application/json")
         .expect("Content-Type", "application/json; charset=utf-8")
         .expect(404)
-        .expect(function(res) {
-          expect(res.body).to.be.instanceOf(Object);
-          expect(res.body).to.be.emtpy; // eslint-disable-line no-unused-expressions
-        })
         .end(done);
     });
+
+    it("'[POST] /consumers' fails with 400 due invalid data", function(done) {
+      var props = {}; // Bad values
+      request("http://localhost:9999")
+        .post("/consumers")
+        .send(props)
+        .set("Accept", "application/json")
+        .expect("Content-Type", "application/json; charset=utf-8")
+        .expect(400)
+        .end(done);
+    });
+
+  });
+
+
+
+
+  // describe("providers", function() {
+
+    // var providerId; // eslint-disable-line no-unused-vars
+
+    // it("should get an emtpy providers array", function(done) {
+    //   request("http://localhost:9999")
+    //     .get("/providers")
+    //     .set("Accept", "application/json")
+    //     .expect("Content-Type", "application/json; charset=utf-8")
+    //     .expect(200)
+    //     .expect(function(res) {
+    //       expect(res.body).to.be.instanceOf(Array);
+    //       expect(res.body).to.be.emtpy; // eslint-disable-line no-unused-expressions
+    //     })
+    //     .end(done);
+    // });
+    //
+    // it("fail getting a providers with non existent 'id'", function(done) {
+    //   request("http://localhost:9999")
+    //     .get("/providers/notexists")
+    //     .set("Accept", "application/json")
+    //     .expect("Content-Type", "application/json; charset=utf-8")
+    //     .expect(404)
+    //     .expect(function(res) {
+    //       expect(res.body).to.be.instanceOf(Object);
+    //       expect(res.body).to.be.emtpy; // eslint-disable-line no-unused-expressions
+    //     })
+    //     .end(done);
+    // });
 
     // it("fail adding a new provider due with no data", function(done) {
     //   request("http://localhost:9999")
@@ -230,26 +275,9 @@ describe.skip("routes (memory repository backend)", function() {
     //     });
     // });
 
-  });
-
-  // describe("consumers", function() {
-  //
-  //   it("should get an emtpy consumers array", function(done) {
-  //     request("http://localhost:9999")
-  //       .get("/consumers")
-  //       .set("Accept", "application/json")
-  //       .expect("Content-Type", "application/json; charset=utf-8")
-  //       .expect(200)
-  //       .expect(function(res) {
-  //         expect(res.body).to.be.instanceOf(Array);
-  //         expect(res.body).to.be.emtpy; // eslint-disable-line no-unused-expressions
-  //       })
-  //       .end(done);
-  //   });
-  //
   // });
 
-  describe("resources", function() {
+  // describe("resources", function() {
 
     // var providerId;
 
@@ -321,7 +349,7 @@ describe.skip("routes (memory repository backend)", function() {
   //       .expect(400, done);
   //   });
 
-  });
+  // });
 
   // describe("filters", function() {
   // });
