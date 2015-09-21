@@ -51,13 +51,55 @@ describe("routes (memory backend)", function() {
     });
 
     it("'[POST] /consumers' fails with 400 due invalid data", function(done) {
-      var props = {}; // Bad values
+      var props = "bad_data";
       request("http://localhost:9999")
         .post("/consumers")
         .send(props)
         .set("Accept", "application/json")
         .expect("Content-Type", "application/json; charset=utf-8")
         .expect(400)
+        .end(done);
+    });
+
+    it("'[POST] /consumers' fails with 400 due invalid 'key' property", function(done) {
+      var props = {
+        key: "short",
+        secret: null
+      };
+      request("http://localhost:9999")
+        .post("/consumers")
+        .send(props)
+        .set("Accept", "application/json")
+        .expect("Content-Type", "application/json; charset=utf-8")
+        .expect(400)
+        .end(done);
+    });
+
+    it("'[POST] /consumers' fails with 400 due invalid 'secret' property", function(done) {
+      var props = {
+        key: "01234567890123456789",
+        secret: null
+      };
+      request("http://localhost:9999")
+        .post("/consumers")
+        .send(props)
+        .set("Accept", "application/json")
+        .expect("Content-Type", "application/json; charset=utf-8")
+        .expect(400)
+        .end(done);
+    });
+
+    it("'[POST] /consumers' should success creating a new consumer", function(done) {
+      var props = {
+        key: "01234567890123456789",
+        secret: "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz"
+      };
+      request("http://localhost:9999")
+        .post("/consumers")
+        .send(props)
+        .set("Accept", "application/json")
+        .expect("Content-Type", "application/json; charset=utf-8")
+        .expect(200)
         .end(done);
     });
 
