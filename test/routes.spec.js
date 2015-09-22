@@ -28,6 +28,8 @@ describe("routes (memory backend)", function() {
   //
   describe("consumers", function() {
 
+    var consumerId = null;
+
     it("'[GET] /consumers' should get an emtpy consumers array", function(done) {
       request("http://localhost:9999")
         .get("/consumers")
@@ -100,6 +102,85 @@ describe("routes (memory backend)", function() {
         .set("Accept", "application/json")
         .expect("Content-Type", "application/json; charset=utf-8")
         .expect(200)
+        .expect(function(res) {
+          expect(res.body.id).to.be.not.null;
+          expect(res.body.key).to.be.equal(props.key);
+          expect(res.body.secret).to.be.equal(props.secret);
+
+          consumerId = res.body.id;
+        })
+        .end(done);
+    });
+
+    it("'[PUT] /consumers' fails due invalid data", function(done) {
+      var props = "bad_data";
+      request("http://localhost:9999")
+        .put("/consumers/notexists")
+        .send(props)
+        .set("Accept", "application/json")
+        .expect("Content-Type", "application/json; charset=utf-8")
+        .expect(400)
+        .end(done);
+    });
+
+    it("'[PUT] /consumers' fails due invalid 'key' valye", function(done) {
+      var props = {
+        key: 123,
+        secret: "1234567890abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz"
+      };
+      request("http://localhost:9999")
+        .put("/consumers/notexists")
+        .send(props)
+        .set("Accept", "application/json")
+        .expect("Content-Type", "application/json; charset=utf-8")
+        .expect(400)
+        .end(done);
+    });
+
+    it("'[PUT] /consumers' fails due invalid 'secret' valye", function(done) {
+      var props = {
+        key: "98765432109876543210",
+        secret: "bad"
+      };
+      request("http://localhost:9999")
+        .put("/consumers/notexists")
+        .send(props)
+        .set("Accept", "application/json")
+        .expect("Content-Type", "application/json; charset=utf-8")
+        .expect(400)
+        .end(done);
+    });
+
+    it("'[PUT] /consumers' fails due not existent consumer", function(done) {
+      var props = {
+        key: "98765432109876543210",
+        secret: "1234567890abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz"
+      };
+      request("http://localhost:9999")
+        .put("/consumers/notexists")
+        .send(props)
+        .set("Accept", "application/json")
+        .expect("Content-Type", "application/json; charset=utf-8")
+        .expect(404)
+        .end(done);
+    });
+
+    it("'[PUT] /consumers' should succes updating a consumer", function(done) {
+      var props = {
+        key: "98765432109876543210",
+        secret: "1234567890abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz"
+      };
+      request("http://localhost:9999")
+        .put("/consumers/" + consumerId)
+        .send(props)
+        .set("Accept", "application/json")
+        .expect("Content-Type", "application/json; charset=utf-8")
+        .expect(200)
+        .expect(function(res) {
+          expect(res.body.id).to.be.equal(consumerId);
+          expect(res.body.key).to.be.equal(props.key);
+          expect(res.body.secret).to.be.equal(props.secret);
+        })
         .end(done);
     });
 
