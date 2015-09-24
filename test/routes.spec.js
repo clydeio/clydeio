@@ -232,6 +232,9 @@ describe("routes (memory backend)", function() {
         .end(done);
     });
 
+    it.skip("'[DELETE] /consumers' should success deleting a consumer with configurations", function() {
+    });
+
   });
 
 
@@ -481,6 +484,29 @@ describe("routes (memory backend)", function() {
         .expect("Content-Type", "application/json; charset=utf-8")
         .expect(200)
         .end(done);
+    });
+
+    it.skip("'[DELETE] /filters' should fail deleting a filter with configurations", function() {
+    });
+
+    //
+    // Filter-Consumer configuration
+    //
+    describe("filter-consumer config", function() {
+
+      it("'[GET] /filters/{idFilter}/consumerconfig' should get an emtpy filters array", function(done) {
+        request("http://localhost:9999")
+          .get("/filters/" + filterId + "/consumerconfig")
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(200)
+          .expect(function(res) {
+            expect(res.body).to.be.instanceOf(Array);
+            expect(res.body).to.be.emtpy;
+          })
+          .end(done);
+      });
+
     });
 
   });
