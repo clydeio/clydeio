@@ -177,10 +177,9 @@ TODO - Talk about filter, consumers and filter-consumers configurations.
   - `409` if another entity with the same `name` exists.
 
 #### `[DELETE] /configurations/{idConfiguration}`
-- `[DELETE] /configurations/{idConfiguration}`: Delete the given configuration. Operation returns the deleted configuration:
+- `[DELETE] /configurations/{idConfiguration}`: Delete the given configuration. Operation returns the deleted configuration without `id` property:
   ```json
   {
-   "id": "...",
    "name": "...",
    "description": "...."
   }
@@ -266,10 +265,9 @@ TODO - Talk about filter, consumers and filter-consumers configurations.
   - `409` if another entity with the same `key` exists.
 
 #### `[DELETE] /consumers/{idConsumer}`
-- `[DELETE] /consumers/{idConsumer}`: Deletes the specified consumer. Operations returns the deleted consumer entity:
+- `[DELETE] /consumers/{idConsumer}`: Deletes the specified consumer. Operations returns the deleted consumer entity without the `id` property:
   ```json
   {
-    "id": "...",
     "key": "...",
     "secret": "...."
   }
@@ -287,6 +285,7 @@ TODO - Talk about filter, consumers and filter-consumers configurations.
 - `[POST] /providers`: Adds a new provider. Operation expects a `target` server value and a `context` that acts as the root context, which determines which requests are redirected to the target server::
   ```json
   {
+		"description": "....",
     "target": "http://...",
     "context": "/context"
   }
@@ -295,6 +294,7 @@ TODO - Talk about filter, consumers and filter-consumers configurations.
   ```json
   {
     "id": "...",
+		"description": "....",
     "target": "http://...",
     "context": "/context"
   }
@@ -307,6 +307,7 @@ TODO - Talk about filter, consumers and filter-consumers configurations.
   ```json
   {
     "id": "...",
+		"description": "....",
     "target": "http://...",
     "context": "/context"
   }
@@ -318,6 +319,7 @@ TODO - Talk about filter, consumers and filter-consumers configurations.
 * `[PUT] /providers/{idProvider}`: Updates an existent provider. Operation expects to pass an object with the properties to be updated:
   ```json
   {
+		"description": "....",
     "target": "http://...",
     "context": "/context"
   }
@@ -326,6 +328,7 @@ TODO - Talk about filter, consumers and filter-consumers configurations.
   ```json
   {
     "id": "...",
+		"description": "....",
     "target": "http://...",
     "context": "/context"
   }
@@ -335,10 +338,10 @@ TODO - Talk about filter, consumers and filter-consumers configurations.
   - `409`, if another entity with the same `target` or `context` in use exists.
 
 #### `[DELETE] /providers/{idProvider}`
-- `[DELETE] /providers/{idProvider}`: Deletes the specified provider deleting its related root context plus all its children contexts. Operation returns the deleted provider entity:
+- `[DELETE] /providers/{idProvider}`: Deletes the specified provider deleting its related root context plus all its children contexts. Operation returns the deleted provider entity without the `id` property:
   ```json
   {
-    "id": "...",
+    "description": "....",
     "target": "http://...",
     "context": "/context"
   }
@@ -357,6 +360,7 @@ TODO - Talk about filter, consumers and filter-consumers configurations.
   {
     "id": "...",
     "name": "filter name",
+		"description": "....",
     "config": {
       "param": "value",
       "...": "..."
@@ -367,32 +371,12 @@ TODO - Talk about filter, consumers and filter-consumers configurations.
   - `404` if the specified provider does not exists or the specified filter does not belongs to the filter.
 
 ##### `[POST] /providers/{idProvider}/[prefilters|postfilter]/{idFilter}`
-- `[POST] /providers/{idProvider}/[prefilters|postfilter]/{idFilter}`: Attach the specified filter to the provider. Returns the attached filter:
-  ```json
-  {
-    "id": "...",
-    "name": "filter name",
-    "config": {
-      "param": "value",
-      "...": "..."
-    }
-  }
-  ```
+- `[POST] /providers/{idProvider}/[prefilters|postfilter]/{idFilter}`: Attach the specified filter to the provider. Does not return any data.
   Errors:
   - `404` if the specified provider or filter does not exists.
 
 ##### `[DELETE] /providers/{idProvider}/[prefilters|postfilter]/{idFilter}`
-- `[DELETE] /providers/{idProvider}/[prefilters|postfilter]/{idFilter}`: Detach the specified filter from the provider. Returns the detached filter:
-  ```json
-  {
-    "id": "...",
-    "name": "filter name",
-    "config": {
-      "param": "value",
-      "...": "..."
-    }
-  }
-  ```
+- `[DELETE] /providers/{idProvider}/[prefilters|postfilter]/{idFilter}`: Detach the specified filter from the provider. Does not return any data.
   Errors:
   - `404` if the specified provider does not exists or the specified filter does not belongs to the filter.
 
@@ -407,6 +391,7 @@ TODO - Talk about filter, consumers and filter-consumers configurations.
   ```json
   {
     "id": "...",
+		"description": "....",
     "path": "/resource_path"
   }
   ```
@@ -414,25 +399,13 @@ TODO - Talk about filter, consumers and filter-consumers configurations.
   - `404` if the entity not exists.
 
 ##### `[POST] /providers/{idProvider}/resources/{idResource}`
-- `[POST] /providers/{idProvider}/resources/{idResource}`: Attach the given resource to the specified provider. Returns the attached resource:
-  ```json
-  {
-    "id": "...",
-    "path": "/resource_path"
-  }
-  ```
+- `[POST] /providers/{idProvider}/resources/{idResource}`: Attach the given resource to the specified provider. Does not return any data.
   Errors:
   - `404` if the provider or resource does not exists.
   - `409` if the resources is attached to another provider.
 
 ##### `[DELETE] /providers/{idProvider}/resources/{idResource}`
-- `[DELETE] /providers/{idProvider}/resources/{idResource}`: Detach the resource from the provider. Returns the detached resource:
-  ```json
-  {
-    "id": "...",
-    "path": "/resource_path"
-  }
-  ```
+- `[DELETE] /providers/{idProvider}/resources/{idResource}`: Detach the resource from the provider. Does not return any data.
   Errors:
   - `404` if the provider does not exists or the resource does not belongs to the provider.
 
@@ -443,21 +416,27 @@ TODO - Talk about filter, consumers and filter-consumers configurations.
 - `[GET] /filters`: Returns an array with all the configured filters (empty if there is no one configured). See `/filters/{idFilter}` to see the `filter` structure.
 
 #### `[POST] /filters`
-- `[POST] /filters`: Adds a new filter. Operation expects a `name` and a `config` values:
+- `[POST] /filters`: Adds a new filter. Operation expects need values to create a filter instane:
   ```json
   {
+		"module": "node module path",
     "name": "filter name",
+		"description": "....",
     "config": {
       "param": "value",
       "...": "..."
     }
   }
   ```
+	> NOTE the `module` property must be the exact filter's module name. The `module` property is used to load the node module. It can be a global node's module (like `myFilter`), which means it will be loaded from the `node_modules` folder, or a relative path (like `./myFilter`), which means it will be loaded relative to the `filters` folder within the ClydeIO code folder.
+
   Operation creates a new filter and returns the new created filter entity:
   ```json
   {
     "id": "...",
+		"module": "node module path",
     "name": "filter name",
+		"description": "....",
     "config": {
       "param": "value",
       "...": "..."
@@ -472,7 +451,9 @@ TODO - Talk about filter, consumers and filter-consumers configurations.
   ```json
   {
     "id": "...",
+		"module": "node module path",
     "name": "filter name",
+		"description": "....",
     "config": {
       "param": "value",
       "...": "..."
@@ -486,7 +467,9 @@ TODO - Talk about filter, consumers and filter-consumers configurations.
 - `[PUT] /filters/{idFilter}`: Updates a filter. Operation expects an object with the properties to be updated:
   ```json
   {
+		"module": "node module path",
     "name": "filter name",
+		"description": "....",
     "config": {
       "param": "value",
       "...": "..."
@@ -497,7 +480,9 @@ TODO - Talk about filter, consumers and filter-consumers configurations.
   ```json
   {
     "id": "...",
+		"module": "node module path",
     "name": "filter name",
+		"description": "....",
     "config": {
       "param": "value",
       "...": "..."
@@ -509,11 +494,12 @@ TODO - Talk about filter, consumers and filter-consumers configurations.
   - `409` if another entity with the same `name` exists.
 
 #### `[DELETE] /filters/{idFilter}`
-- `[DELETE] /filters/{idFilter}`: Deletes the specified filter. Operation returns the delted filter:
+- `[DELETE] /filters/{idFilter}`: Deletes the specified filter. Operation returns the deleted filter without `id` property:
   ```json
   {
-    "id": "...",
+		"module": "node module path",
     "name": "filter name",
+		"description": "....",
     "config": {
       "param": "value",
       "...": "..."
@@ -548,17 +534,19 @@ TODO - Continue
 - `[GET] /resources`: Returns an array with all the configured resources. See `/resources/{idResource}` to see the `resource` entity.
 
 #### `[POST] /resources`
-- `[POST] /resources`: Creates a new resource. Operation expects a `path` value:
+- `[POST] /resources`: Creates a new resource. Operation expects an object with the required properties:
   ```json
   {
-  "path": "/resource_path"
+  "path": "/resource_path",
+	"description": "...."
   }
   ```
   Operation returns the new created resource:
   ```json
   {
     "id": "...",
-    "path": "/resource_path"
+    "path": "/resource_path",
+		"description": "...."
   }
   ```
 
@@ -567,7 +555,8 @@ TODO - Continue
   ```json
   {
     "id": "...",
-    "path": "/resource_path"
+    "path": "/resource_path",
+		"description": "...."
   }
   ```
   Errors:
@@ -577,25 +566,27 @@ TODO - Continue
 - `[PUT] /resources/{idResource}`: Updated the resources properties. Operations expects an object with the properties to be updated:
   ```json
   {
-  "path": "/resource_path"
+  "path": "/resource_path",
+	"description": "...."
   }
   ```
   Operation returns the new created resource:
   ```json
   {
     "id": "...",
-    "path": "/resource_path"
+    "path": "/resource_path",
+		"description": "...."
   }
   ```
   Errors:
   - `404` if the resource does not exists.
 
 #### `[DELETE] /resources/{idResource}`
-- `[DELETE] /resources/{idResource}`: Deletes the specified resource. Operations returns the deleted resources:
+- `[DELETE] /resources/{idResource}`: Deletes the specified resource. Operations returns the deleted resource without `id` property:
   ```json
   {
-    "id": "...",
-    "path": "/resource_path"
+    "path": "/resource_path",
+		"description": "...."
   }
   ```
 
@@ -610,6 +601,7 @@ TODO - Continue
   {
     "id": "...",
     "name": "filter name",
+		"description": "....",
     "config": {
       "param": "value",
       "...": "..."
@@ -620,31 +612,11 @@ TODO - Continue
   - `404` if the specified resource does not exists or the specified filter does not belongs to the resource.
 
 ##### `[POST] /resources/{idResource}/[prefilters|postfilter]/{idFilter}`
-- `[POST] /resources/{idResource}/[prefilters|postfilter]/{idFilter}`: Attach the specified filter to the resource. Returns the attached filter:
-  ```json
-  {
-    "id": "...",
-    "name": "filter name",
-    "config": {
-      "param": "value",
-      "...": "..."
-    }
-  }
-  ```
+- `[POST] /resources/{idResource}/[prefilters|postfilter]/{idFilter}`: Attach the specified filter to the resource. Does not return data.
   Errors:
   - `404` if the specified resource or filter does not exists.
 
 ##### `[DELETE] /resources/{idResource}/[prefilters|postfilter]/{idFilter}`
-- `[DELETE] /resources/{idResource}/[prefilters|postfilter]/{idFilter}`: Detach the specified filter from the resource. Returns the detached filter:
-  ```json
-  {
-    "id": "...",
-    "name": "filter name",
-    "config": {
-      "param": "value",
-      "...": "..."
-    }
-  }
-  ```
+- `[DELETE] /resources/{idResource}/[prefilters|postfilter]/{idFilter}`: Detach the specified filter from the resource. Does not return data.
   Errors:
   - `404` if the specified resource does not exists or the specified filter does not belongs to the resource.
