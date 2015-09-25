@@ -29,7 +29,7 @@ Next UML diagram show a representation of all the involved concepts:
 ```
 [Configuration|id;description]
 [Filter|id;name;description;config]
-[Provider|id;target;description]
+[Provider|id;target;description;context]
 [Resource|id;path;description]
 [FilterConsumer|config]
 
@@ -54,11 +54,11 @@ A configuration can have attached many prefilters and postfilters. Each time a r
 
 A configuration contains a set of providers. The providers handle the requests that match the given `context` and are redirected to the specified `target` server. A provider can also have prefilters and postfilters. They executed before and after the request is redirected to the target server.
 
-In some cases, we want to have a great degree of control about the resources requested by consumers. Suppose we have a private API at `http://privateAPI.com` which allow to list orders resource `http://privateAPI.com/orders` and their users resource `http://privateAPI.com/users`. Suppose we have configured our ClydeIO server to catch all the request that starts with the context `/some_context` (the request would be something like `http://our.clydeio.server/some_context`) and be redirected to the private API at the target server `http://privateAPI.com`. Also we have attached to the provider a prefilter to log all the requested URLs in a log file.
+In some cases, we want to have a fine degree of control about the resources requested by consumers. Suppose we have a private API at `http://privateAPI.com` which allow to list orders resource `http://privateAPI.com/orders` and their users resource `http://privateAPI.com/users`. Suppose we have configured our ClydeIO server to catch all the request that starts with the context `/some_context` (the request would be something like `http://our.clydeio.server/some_context`) and be redirected to the private API at the target server `http://privateAPI.com`. Also we have attached to the provider a prefilter to log all the requested URLs in a log file.
 
 That configuration offers great flexibility but, what if we want to have too different log files: one to store all the requests to the `/some_context/orders` and a second to log the requests to `/some_context/users`.
 
-To solve this situations and offers a greater degree of flexibility ClydeIO allows to configure resources too. This way, a provider can have many resources, each one with its own `path` and its own prefilters and postfilters.
+To solve this situations and offer a bit more of of flexibility ClydeIO allows to configure resources too. This way, a provider can have many resources, each one with its own `path` and its own prefilters and postfilters.
 
 
 
@@ -377,6 +377,9 @@ Consumers can have specific configurations applied on filters. Next operations a
 
 ### Providers
 
+Providers represents private APIs. For each provider you must specify a `target` server and a `context`, used to match each request and determine to which target server the request must be proxied to.
+
+
 #### `[GET] /providers`
 - `[GET] /providers`: Returns an array of `providers` (empty if there is no one configured). See `/providers/{idProvider}` to see the `provider` structure.
 
@@ -399,7 +402,8 @@ Consumers can have specific configurations applied on filters. Next operations a
   }
   ```
   Errors:
-  - `409` if another entity with the same `target` exists or the specified root context `context` is used by another provider.
+	- `400` if parameters are invalids.
+  - `409` if another entity with the same `context` exists.
 
 #### `[GET] /providers/{idProvider}`
 - `[GET] /providers/{idProvider}`: Returns the given provider:

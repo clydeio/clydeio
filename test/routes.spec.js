@@ -924,6 +924,144 @@ describe("routes (memory backend)", function() {
 
     });
 
+  });
+
+
+  //
+  // Providers
+  //
+
+  describe("providers", function() {
+
+    var providerId = null;
+
+    it("'[GET] /providers' should return an empty array of providers", function(done) {
+      request("http://localhost:9999")
+        .get("/providers")
+        .set("Accept", "application/json")
+        .expect("Content-Type", "application/json; charset=utf-8")
+        .expect(200)
+        .expect(function(res) {
+          expect(res.body).to.be.instanceOf(Array);
+          expect(res.body).to.be.emtpy;
+        })
+        .end(done);
+    });
+
+    it("'[GET] /providers' fails due not existent provider", function(done) {
+      request("http://localhost:9999")
+        .get("/providers/notexists")
+        .set("Accept", "application/json")
+        .expect("Content-Type", "application/json; charset=utf-8")
+        .expect(404)
+        .end(done);
+    });
+
+    it("'[POST] /providers' fails creating a provier due invalid 'target' value", function(done) {
+      var props = {
+        notarget: ""
+      };
+      request("http://localhost:9999")
+        .post("/providers")
+        .send(props)
+        .set("Accept", "application/json")
+        .expect("Content-Type", "application/json; charset=utf-8")
+        .expect(400)
+        .end(done);
+    });
+
+    it("'[POST] /providers' fails creating a provier due invalid 'context' value", function(done) {
+      var props = {
+        target: "http://someserver.com"
+      };
+      request("http://localhost:9999")
+        .post("/providers")
+        .send(props)
+        .set("Accept", "application/json")
+        .expect("Content-Type", "application/json; charset=utf-8")
+        .expect(400)
+        .end(done);
+    });
+
+    it("'[POST] /providers' should success creating a provier", function(done) {
+      var props = {
+        target: "http://someserver.com",
+        context: "/context",
+        description: "description for this provider"
+      };
+      request("http://localhost:9999")
+        .post("/providers")
+        .send(props)
+        .set("Accept", "application/json")
+        .expect("Content-Type", "application/json; charset=utf-8")
+        .expect(200)
+        .expect(function(res) {
+          expect(res.body.id).to.be.not.null;
+          expect(res.body.target).to.be.equal(props.target);
+          expect(res.body.context).to.be.equal(props.context);
+          expect(res.body.description).to.be.equal(props.description);
+
+          // Store id
+          providerId = res.body.id;
+        })
+        .end(done);
+    });
+
+    it("'[POST] /providers' fails creating a provier due duplicated 'context'", function(done) {
+      var props = {
+        target: "http://someserver.com",
+        context: "/context",
+        description: "description for this provider"
+      };
+      request("http://localhost:9999")
+        .post("/providers")
+        .send(props)
+        .set("Accept", "application/json")
+        .expect("Content-Type", "application/json; charset=utf-8")
+        .expect(409)
+        .end(done);
+    });
+
+    it("'[GET] /providers' should return a provider", function(done) {
+      request("http://localhost:9999")
+        .get("/providers/" + providerId)
+        .set("Accept", "application/json")
+        .expect("Content-Type", "application/json; charset=utf-8")
+        .expect(200)
+        .end(done);
+    });
+
+    it("'[PUT] /providers' fails updating a provier due invalid 'target' value", function(done) {
+      var props = {
+        notarget: ""
+      };
+      request("http://localhost:9999")
+        .put("/providers")
+        .send(props)
+        .set("Accept", "application/json")
+        .expect("Content-Type", "application/json; charset=utf-8")
+        .expect(400)
+        .end(done);
+    });
+
+    it("'[PUT] /providers' fails updating a provier due invalid 'context' value", function(done) {
+      var props = {
+        target: "http://someserver.com"
+      };
+      request("http://localhost:9999")
+        .put("/providers")
+        .send(props)
+        .set("Accept", "application/json")
+        .expect("Content-Type", "application/json; charset=utf-8")
+        .expect(400)
+        .end(done);
+    });
+
+    it("'[PUT] /providers' fails updating a provier due duplicated 'context' value", function(done) {
+    });
+
+    it("'[PUT] /providers' success updating a provier", function(done) {
+    });
 
   });
 
