@@ -209,6 +209,9 @@ TODO - Talk about filter, consumers and filter-consumers configurations.
 - `[DELETE] /configurations/{idConfiguration}/providers/{idProvider}`: Detach
 
 
+---
+
+
 ### Consumers
 
 #### `[GET] /consumers`
@@ -278,6 +281,99 @@ TODO - Talk about filter, consumers and filter-consumers configurations.
   Errors:
   - `404` if entity not exists.
   > Note, delete a consumer implies all its related filters configurations are removed too.
+
+#### Consumer's filters configuration
+
+Consumers can have specific configurations applied on filters. Next operations allow to create, update or delete consumer's configurations attached to a given filter.
+
+>Note, **removing a consumer implies remove all its configurations on any filter**.
+
+##### `[GET] /consumers/{idConsumer}/consumerconfig`
+- `[GET] /consumers/{idConsumer}/consumerconfig`: Returns an array with all the specific filter configurations of consumers (empty if there is no one configured). See `/consumers/{idConsumer}/consumerconfig/{idConsumer}` to see the `consumerconfig` structure.
+
+##### `[GET] /consumers/{idConsumer}/consumerconfig/{idConsumer}`
+- `[GET] /consumers/{idConsumer}/consumerconfig/{idConsumer}`: Returns the concrete configuration for a given consumer or 404 if the entity not exists:
+  ```json
+  {
+    "idFilter": "...",
+    "idConsumer": "...",
+    "config": {
+      "param": "value",
+      "...": "..."
+    }
+  }
+  ```
+	Errors:
+	- `404` if the specified filter or consumer does not exists.
+
+##### `[POST] /consumers/{idConsumer}/consumerconfig/{idConsumer}`
+- `[POST] /consumers/{idConsumer}/consumerconfig/{idConsumer}`: Adds a new specific consumer configuration to the filter. Operation expects need values to create a consumer config instance:
+	```json
+	{
+		"config": {
+			"param": "value",
+			"...": "..."
+		}
+	}
+	```
+  Operation creates a new concrete consumer-filter configuration and returns the new created entity:
+	```json
+	{
+		"idFilter": "...",
+		"idConsumer": "...",
+		"config": {
+			"param": "value",
+			"...": "..."
+		}
+	}
+	```
+  Errors:
+	- `404` if the specified filter or consumer does not exists.
+  - `409` if another configuration for the same filter and consumer exists.
+
+
+##### `[PUT] /consumers/{idConsumer}/consumerconfig/{idConsumer}`
+- `[PUT] /consumers/{idConsumer}/consumerconfig/{idConsumer}`: Modifies the configuration of the given consumer on the given filter. Operation expects an object with the properties to be updated:
+	```json
+	{
+		"config": {
+			"param": "value",
+			"...": "..."
+		}
+	}
+	```
+	Operation creates a new concrete consumer-filter configuration and returns the new created entity:
+	```json
+	{
+		"idFilter": "...",
+		"idConsumer": "...",
+		"config": {
+			"param": "value",
+			"...": "..."
+		}
+	}
+	```
+  Errors:
+	- `400` if specified data is invalid.
+	- `404` if the specified filter or consumer does not exists.
+
+
+##### `[DELETE] /consumers/{idConsumer}/consumerconfig/{idConsumer}`
+- `[DELETE] /consumers/{idConsumer}/consumerconfig/{idConsumer}`: Deletes the specified filter-consumer configuration. Operation returns the `config` property of the deleted configuration:
+  ```json
+  {
+    "config": {
+      "param": "value",
+      "...": "..."
+    }
+  }
+  ```
+  Errors:
+	- `404` if the specified filter or consumer does not exists.
+
+
+---
+
 
 ### Providers
 
@@ -352,6 +448,7 @@ TODO - Talk about filter, consumers and filter-consumers configurations.
   Errors:
   - `404` if not exists.
 
+
 #### Provider's Prefilters/Postfilters
 
 ##### `[GET] /providers/{idProvider}/[prefilters|postfilter]`
@@ -411,6 +508,9 @@ TODO - Talk about filter, consumers and filter-consumers configurations.
 - `[DELETE] /providers/{idProvider}/resources/{idResource}`: Detach the resource from the provider. Does not return any data.
   Errors:
   - `404` if the provider does not exists or the resource does not belongs to the provider.
+
+
+---
 
 
 ### Filters
@@ -511,8 +611,14 @@ TODO - Talk about filter, consumers and filter-consumers configurations.
   ```
   Errors:
   - `404` if the specified entity does not exists.
+  - `409` if the specified filter has consumer configurations attached to it.
+> We can not delete filters that have consumer's configurations attached.
 
 #### Filter's consumer configuration
+
+Consumers can have specific configurations applied on each filter. Next operations allows to see those concrete consumer's configurations.
+
+> To create, update are delete configurations see operations: `/consumers/{idConsumer}/consumerconfig`.
 
 ##### `[GET] /filters/{idFilter}/consumerconfig`
 - `[GET] /filters/{idFilter}/consumerconfig`: Returns an array with all the specific filter configurations of consumers (empty if there is no one configured). See `/filters/{idFilter}/consumerconfig/{idConsumer}` to see the `consumerconfig` structure.
@@ -532,70 +638,8 @@ TODO - Talk about filter, consumers and filter-consumers configurations.
 	Errors:
 	- `404` if the specified filter or consumer does not exists.
 
-##### `[POST] /filters/{idFilter}/consumerconfig/{idConsumer}`
-- `[POST] /filters/{idFilter}/consumerconfig/{idConsumer}`: Adds a new specific consumer configuration to the filter. Operation expects need values to create a consumer config instance:
-	```json
-	{
-		"config": {
-			"param": "value",
-			"...": "..."
-		}
-	}
-	```
-  Operation creates a new concrete consumer-filter configuration and returns the new created entity:
-	```json
-	{
-		"idFilter": "...",
-		"idConsumer": "...",
-		"config": {
-			"param": "value",
-			"...": "..."
-		}
-	}
-	```
-  Errors:
-	- `404` if the specified filter or consumer does not exists.
-  - `409` if another configuration for the same filter and consumer exists.
 
-
-##### `[PUT] /filters/{idFilter}/consumerconfig/{idConsumer}`
-- `[PUT] /filters/{idFilter}/consumerconfig/{idConsumer}`: Modifies the configuration of the given consumer on the given filter. Operation expects an object with the properties to be updated:
-	```json
-	{
-		"config": {
-			"param": "value",
-			"...": "..."
-		}
-	}
-	```
-	Operation creates a new concrete consumer-filter configuration and returns the new created entity:
-	```json
-	{
-		"idFilter": "...",
-		"idConsumer": "...",
-		"config": {
-			"param": "value",
-			"...": "..."
-		}
-	}
-	```
-  Errors:
-	- `400` if specified data is invalid.
-	- `404` if the specified filter or consumer does not exists.
-
-
-##### `[DELETE] /filters/{idFilter}/consumerconfig/{idConsumer}`
-- `[DELETE] /filters/{idFilter}/consumerconfig/{idConsumer}`: Deletes the specified filter-consumer configuration. Operation returns the `config` property of the deleted configuration:
-  ```json
-  {
-    "config": {
-      "param": "value",
-      "...": "..."
-    }
-  }
-  ```
-  Errors:
-	- `404` if the specified filter or consumer does not exists.
+---
 
 
 ### Resources

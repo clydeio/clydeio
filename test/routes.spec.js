@@ -235,6 +235,204 @@ describe("routes (memory backend)", function() {
     it.skip("'[DELETE] /consumers' should success deleting a consumer with configurations", function() {
     });
 
+
+    //
+    // Consumer-Filter configuration
+    //
+    describe("consumer-filter configuration", function() {
+
+      var filterId = null;
+
+      before(function(done) {
+        // Create a test filter
+        var props = {
+          module: "some path",
+          name: "some name"
+        };
+        request("http://localhost:9999")
+          .post("/filters")
+          .send(props)
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(200)
+          .expect(function(res) {
+            expect(res.body.id).to.be.not.null;
+            expect(res.body.module).to.be.equal(props.module);
+            expect(res.body.name).to.be.equal(props.name);
+            expect(res.body.description).to.be.equal(props.description);
+            expect(res.body.config).to.be.equal(props.config);
+
+            filterId = res.body.id;
+          })
+          .end(done);
+      });
+
+      after(function(done) {
+        // Delete the test filter
+        request("http://localhost:9999")
+          .delete("/filters/" + filterId)
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(200)
+          .end(done);
+      });
+
+      it("'[GET] /consumers/{idConsumer}/consumerconfig' should get an emtpy filters array", function(done) {
+        request("http://localhost:9999")
+          .get("/consumers/" + filterId + "/consumerconfig")
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(200)
+          .expect(function(res) {
+            expect(res.body).to.be.instanceOf(Array);
+            expect(res.body).to.be.emtpy;
+          })
+          .end(done);
+      });
+
+      it("'[GET] /consumers/notexists/consumerconfig/{idConsumer}' fails with 404 due consumer not exists", function(done) {
+        request("http://localhost:9999")
+          .get("/consumers/notexists/consumerconfig/notexists")
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(404)
+          .end(done);
+      });
+
+      it("'[GET] /consumers/{idConsumer}/consumerconfig/notexists' fails with 404 due filter not exists", function(done) {
+        request("http://localhost:9999")
+          .get("/consumers/" + filterId + "/consumerconfig/notexists")
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(404)
+          .end(done);
+      });
+
+      it("'[GET] /consumers/{idConsumer}/consumerconfig/{idFilter}' fails due no config found", function(done) {
+        request("http://localhost:9999")
+          .get("/consumers/" + consumerId + "/consumerconfig/" + filterId)
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(404)
+          .end(done);
+      });
+
+      it("'[POST] /consumers/{idConsumer}/consumerconfig/{idFilter}' fails due invalid 'config' data", function(done) {
+        var props = "bad config";
+        request("http://localhost:9999")
+          .post("/consumers/" + consumerId + "/consumerconfig/" + filterId)
+          .send(props)
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(400)
+          .end(done);
+      });
+
+      it("'[POST] /consumers/{idConsumer}/consumerconfig/{idFilter}' fails due no entity found", function(done) {
+        var props = {
+          config: {}
+        };
+        request("http://localhost:9999")
+          .post("/consumers/" + consumerId + "/consumerconfig/notexists")
+          .send(props)
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(404)
+          .end(done);
+      });
+
+      it("'[POST] /consumers/{idConsumer}/consumerconfig/{idFilter}' should success creating a new configuration", function(done) {
+        var props = {
+          config: {
+            paramA: "valueA",
+            paramB: "valueB"
+          }
+        };
+        request("http://localhost:9999")
+          .post("/consumers/" + consumerId + "/consumerconfig/" + filterId)
+          .send(props)
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(200)
+          .end(done);
+      });
+
+      it("'[POST] /consumers/{idConsumer}/consumerconfig/{idFilter}' fails due configuration already exists", function(done) {
+        var props = {
+          config: {
+            paramA: "valueA",
+            paramB: "valueB"
+          }
+        };
+        request("http://localhost:9999")
+          .post("/consumers/" + consumerId + "/consumerconfig/" + filterId)
+          .send(props)
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(409)
+          .end(done);
+      });
+
+      it("'[PUT] /consumers/{idConsumer}/consumerconfig/{idFilter}' fails due invalid 'config' data", function(done) {
+        var props = "bad config";
+        request("http://localhost:9999")
+          .put("/consumers/" + consumerId + "/consumerconfig/" + filterId)
+          .send(props)
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(400)
+          .end(done);
+      });
+
+      it("'[PUT] /consumers/{idConsumer}/consumerconfig/{idFilter}' fails due no entity found", function(done) {
+        var props = {
+          config: {}
+        };
+        request("http://localhost:9999")
+          .post("/consumers/" + consumerId + "/consumerconfig/notexists")
+          .send(props)
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(404)
+          .end(done);
+      });
+
+      it("'[PUT] /consumers/{idConsumer}/consumerconfig/{idFilter}' succes updating config", function(done) {
+        var props = {
+          config: {
+            paramA: "123",
+            paramB: "456"
+          }
+        };
+        request("http://localhost:9999")
+          .put("/consumers/" + consumerId + "/consumerconfig/" + filterId)
+          .send(props)
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(200)
+          .end(done);
+      });
+
+      it("'[DELETE] /consumers/{idConsumer}/consumerconfig/{idFilter}' fails due no entity found", function(done) {
+        request("http://localhost:9999")
+          .delete("/consumers/" + consumerId + "/consumerconfig/notexists")
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(404)
+          .end(done);
+      });
+
+      it("'[DELETE] /consumers/{idConsumer}/consumerconfig/{idFilter}' succes deleting a config", function(done) {
+        request("http://localhost:9999")
+          .delete("/consumers/" + consumerId + "/consumerconfig/" + filterId)
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(200)
+          .end(done);
+      });
+
+    });
+
   });
 
 
@@ -487,26 +685,6 @@ describe("routes (memory backend)", function() {
     });
 
     it.skip("'[DELETE] /filters' should fail deleting a filter with configurations", function() {
-    });
-
-    //
-    // Filter-Consumer configuration
-    //
-    describe("filter-consumer config", function() {
-
-      it("'[GET] /filters/{idFilter}/consumerconfig' should get an emtpy filters array", function(done) {
-        request("http://localhost:9999")
-          .get("/filters/" + filterId + "/consumerconfig")
-          .set("Accept", "application/json")
-          .expect("Content-Type", "application/json; charset=utf-8")
-          .expect(200)
-          .expect(function(res) {
-            expect(res.body).to.be.instanceOf(Array);
-            expect(res.body).to.be.emtpy;
-          })
-          .end(done);
-      });
-
     });
 
   });
