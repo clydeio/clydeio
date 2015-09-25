@@ -232,39 +232,161 @@ describe("routes (memory backend)", function() {
         .end(done);
     });
 
-    it.skip("'[DELETE] /consumers' should success deleting a consumer with configurations", function() {
+    //
+    // Consumer-Filter configuration delete
+    //
+    describe("consumer delete", function() {
+
+      var cid = null, fid = null;
+
+      before(function(done) {
+        // Create consumer
+        var propsConsumer = {
+          key: "abcdefghijklmnopqrstuvwxyz",
+          secret: "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz"
+        };
+        request("http://localhost:9999")
+          .post("/consumers")
+          .send(propsConsumer)
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(200)
+          .expect(function(res) {
+            expect(res.body.id).to.be.not.null;
+            expect(res.body.key).to.be.equal(propsConsumer.key);
+            expect(res.body.secret).to.be.equal(propsConsumer.secret);
+
+            cid = res.body.id;
+          })
+          .end(function() {
+            // Create filter
+            var propsFilter = {
+              module: "other path",
+              name: "test filter name",
+              description: "some description",
+              config: {
+                param: "value"
+              }
+            };
+            request("http://localhost:9999")
+              .post("/filters")
+              .send(propsFilter)
+              .set("Accept", "application/json")
+              .expect("Content-Type", "application/json; charset=utf-8")
+              .expect(200)
+              .expect(function(res) {
+                expect(res.body.id).to.be.not.null;
+                expect(res.body.module).to.be.equal(propsFilter.module);
+                expect(res.body.name).to.be.equal(propsFilter.name);
+                expect(res.body.description).to.be.equal(propsFilter.description);
+                expect(res.body.config.param).to.be.equal(propsFilter.config.param);
+
+                fid = res.body.id;
+              })
+              .end(function() {
+                // Create filter-consumer configuration
+                var propsConf = {
+                  config: {
+                    paramA: "valueA",
+                    paramB: "valueB"
+                  }
+                };
+                request("http://localhost:9999")
+                  .post("/consumers/" + cid + "/consumerconfig/" + fid)
+                  .send(propsConf)
+                  .set("Accept", "application/json")
+                  .expect("Content-Type", "application/json; charset=utf-8")
+                  .expect(200)
+                  .end(done);
+              });
+          });
+      });
+
+      after(function(done) {
+        // Remove filter-consumer config
+        request("http://localhost:9999")
+          .delete("/filters/" + fid)
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(200)
+          .end(done);
+      });
+
+      it("'[DELETE] /consumers' should success deleting a consumer with configurations", function(done) {
+        request("http://localhost:9999")
+          .delete("/consumers/" + cid)
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(200)
+          .end(function() {
+            request("http://localhost:9999")
+              .get("/consumers/" + cid)
+              .set("Accept", "application/json")
+              .expect("Content-Type", "application/json; charset=utf-8")
+              .expect(404)
+              .end(function() {
+                request("http://localhost:9999")
+                  .get("/consumers/" + cid + "/consumerconfig/" + fid)
+                  .set("Accept", "application/json")
+                  .expect("Content-Type", "application/json; charset=utf-8")
+                  .expect(404)
+                  .end(done);
+              });
+          });
+      });
+
     });
 
 
     //
     // Consumer-Filter configuration
     //
-    describe("consumer-filter configuration", function() {
+    describe("consumer-filter", function() {
 
       var filterId = null;
 
       before(function(done) {
-        // Create a test filter
-        var props = {
-          module: "some path",
-          name: "some name"
+        // Create consumer
+        var propsConsumer = {
+          key: "abcdefghijklmnopqrstuvwxyz",
+          secret: "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz"
         };
         request("http://localhost:9999")
-          .post("/filters")
-          .send(props)
+          .post("/consumers")
+          .send(propsConsumer)
           .set("Accept", "application/json")
           .expect("Content-Type", "application/json; charset=utf-8")
           .expect(200)
           .expect(function(res) {
             expect(res.body.id).to.be.not.null;
-            expect(res.body.module).to.be.equal(props.module);
-            expect(res.body.name).to.be.equal(props.name);
-            expect(res.body.description).to.be.equal(props.description);
-            expect(res.body.config).to.be.equal(props.config);
+            expect(res.body.key).to.be.equal(propsConsumer.key);
+            expect(res.body.secret).to.be.equal(propsConsumer.secret);
 
-            filterId = res.body.id;
+            consumerId = res.body.id;
           })
-          .end(done);
+          .end(function() {
+            // Create a test filter
+            var propsFilter = {
+              module: "some path",
+              name: "some name"
+            };
+            request("http://localhost:9999")
+              .post("/filters")
+              .send(propsFilter)
+              .set("Accept", "application/json")
+              .expect("Content-Type", "application/json; charset=utf-8")
+              .expect(200)
+              .expect(function(res) {
+                expect(res.body.id).to.be.not.null;
+                expect(res.body.module).to.be.equal(propsFilter.module);
+                expect(res.body.name).to.be.equal(propsFilter.name);
+                expect(res.body.description).to.be.equal(propsFilter.description);
+                expect(res.body.config).to.be.equal(propsFilter.config);
+
+                filterId = res.body.id;
+              })
+              .end(done);
+          });
       });
 
       after(function(done) {
@@ -277,9 +399,18 @@ describe("routes (memory backend)", function() {
           .end(done);
       });
 
+      it("'[GET] /consumers/{idConsumer}/consumerconfig' fails due consumer not exists", function(done) {
+        request("http://localhost:9999")
+          .get("/consumers/notexists/consumerconfig")
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(404)
+          .end(done);
+      });
+
       it("'[GET] /consumers/{idConsumer}/consumerconfig' should get an emtpy filters array", function(done) {
         request("http://localhost:9999")
-          .get("/consumers/" + filterId + "/consumerconfig")
+          .get("/consumers/" + consumerId + "/consumerconfig")
           .set("Accept", "application/json")
           .expect("Content-Type", "application/json; charset=utf-8")
           .expect(200)
@@ -684,8 +815,115 @@ describe("routes (memory backend)", function() {
         .end(done);
     });
 
-    it.skip("'[DELETE] /filters' should fail deleting a filter with configurations", function() {
+    //
+    // Filter-consumer
+    //
+
+    describe("filter-consumer", function() {
+
+      var cid = null, fid = null;
+
+      before(function(done) {
+        // Create consumer
+        var props = {
+          key: "01234567890123456789",
+          secret: "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz"
+        };
+        request("http://localhost:9999")
+          .post("/consumers")
+          .send(props)
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(200)
+          .expect(function(res) {
+            expect(res.body.id).to.be.not.null;
+            expect(res.body.key).to.be.equal(props.key);
+            expect(res.body.secret).to.be.equal(props.secret);
+
+            cid = res.body.id;
+          })
+          .end(function() {
+            // Create filter
+            var propsFilter = {
+              module: "other path",
+              name: "other name",
+              description: "some description",
+              config: {
+                param: "value"
+              }
+            };
+            request("http://localhost:9999")
+              .post("/filters")
+              .send(propsFilter)
+              .set("Accept", "application/json")
+              .expect("Content-Type", "application/json; charset=utf-8")
+              .expect(200)
+              .expect(function(res) {
+                expect(res.body.id).to.be.not.null;
+                expect(res.body.module).to.be.equal(propsFilter.module);
+                expect(res.body.name).to.be.equal(propsFilter.name);
+                expect(res.body.description).to.be.equal(propsFilter.description);
+                expect(res.body.config.param).to.be.equal(propsFilter.config.param);
+
+                fid = res.body.id;
+              })
+              .end(function() {
+                // Create filter-consumer configuration
+                var propsConfig = {
+                  config: {
+                    paramA: "valueA",
+                    paramB: "valueB"
+                  }
+                };
+                request("http://localhost:9999")
+                  .post("/consumers/" + cid + "/consumerconfig/" + fid)
+                  .send(propsConfig)
+                  .set("Accept", "application/json")
+                  .expect("Content-Type", "application/json; charset=utf-8")
+                  .expect(200)
+                  .end(done);
+              });
+          });
+      });
+
+      after(function(done) {
+        // Remove filter-consumer config
+        request("http://localhost:9999")
+          .delete("/consumers/" + cid + "/consumerconfig/" + fid)
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(200)
+          .end(function() {
+            // Remove filter
+            request("http://localhost:9999")
+              .delete("/filters/" + fid)
+              .set("Accept", "application/json")
+              .expect("Content-Type", "application/json; charset=utf-8")
+              .expect(200)
+              .end(function() {
+                // Remove consumer
+                request("http://localhost:9999")
+                  .delete("/consumers/" + cid)
+                  .set("Accept", "application/json")
+                  .expect("Content-Type", "application/json; charset=utf-8")
+                  .expect(200)
+                  .end(done);
+              });
+          });
+      });
+
+      it("'[DELETE] /filters' should fail deleting a filter with configurations", function(done) {
+        // Remove the filter
+        request("http://localhost:9999")
+          .delete("/filters/" + fid)
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(409)
+          .end(done);
+      });
+
     });
+
 
   });
 
