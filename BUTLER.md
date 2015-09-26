@@ -485,7 +485,106 @@ Providers represents private APIs. For each provider you must specify a `target`
   - `404` if the specified provider does not exists or the specified filter does not belongs to the filter.
 
 
+
 #### Provider's Resources
+
+##### `[GET] /providers/{idProvider}/resources`
+- `[GET] /providers/{idProvider}/resources`: Returns an array with all the configured resources. See `/providers/{idProvider}/resources/{idResource}` to see the `resource` entity.
+
+##### `[POST] /providers/{idProvider}/resources`
+- `[POST] /providers/{idProvider}/resources`: Creates a new resource. Operation expects an object with the required properties:
+  ```json
+  {
+  "path": "/resource_path",
+	"description": "...."
+  }
+  ```
+  Operation returns the new created resource:
+  ```json
+  {
+    "id": "...",
+    "path": "/resource_path",
+		"description": "...."
+  }
+  ```
+
+##### `[GET] /providers/{idProvider}/resources/{idResource}`
+- `[GET] /providers/{idProvider}/resources/{idResource}`: Returns the specified resource:
+  ```json
+  {
+    "id": "...",
+    "path": "/resource_path",
+		"description": "...."
+  }
+  ```
+  Errors:
+  - `404` if the entity not exists.
+
+##### `[PUT] /providers/{idProvider}/resources/{idResource}`
+- `[PUT] /providers/{idProvider}/resources/{idResource}`: Updated the resources properties. Operations expects an object with the properties to be updated:
+  ```json
+  {
+  "path": "/resource_path",
+	"description": "...."
+  }
+  ```
+  Operation returns the new created resource:
+  ```json
+  {
+    "id": "...",
+    "path": "/resource_path",
+		"description": "...."
+  }
+  ```
+  Errors:
+  - `404` if the resource does not exists.
+
+##### `[DELETE] /providers/{idProvider}/resources/{idResource}`
+- `[DELETE] /resources/{idResource}`: Deletes the specified resource. Operations returns the deleted resource without `id` property:
+  ```json
+  {
+    "path": "/resource_path",
+		"description": "...."
+  }
+  ```
+
+##### Resource's Filters
+
+###### `[GET] /providers/{idProvider}/resources/{idResource}/[prefilters|postfilter]`
+- `[GET] /providers/{idProvider}/resources/{idResource}/[prefilters|postfilter]`: Returns all the prefilters/postfilters attached with the resource. See `/filters/{idFilter}` to see the filter entity structure.
+
+###### `[GET] /providers/{idProvider}/resources/{idResource}/[prefilters|postfilter]/{idFilter}`
+- `[GET] /providers/{idProvider}/resources/{idResource}/[prefilters|postfilter]/{idFilter}`: Returns the specified filter attached with the resource:
+  ```json
+  {
+    "id": "...",
+    "name": "filter name",
+		"description": "....",
+    "config": {
+      "param": "value",
+      "...": "..."
+    }
+  }
+  ```
+  Errors:
+  - `404` if the specified resource does not exists or the specified filter does not belongs to the resource.
+
+###### `[POST] /providers/{idProvider}/resources/{idResource}/[prefilters|postfilter]/{idFilter}`
+- `[POST] /providers/{idProvider}/resources/{idResource}/[prefilters|postfilter]/{idFilter}`: Attach the specified filter to the resource. Does not return data.
+  Errors:
+  - `404` if the specified resource or filter does not exists.
+
+###### `[DELETE] /providers/{idProvider}/resources/{idResource}/[prefilters|postfilter]/{idFilter}`
+- `[DELETE] /providers/{idProvider}/resources/{idResource}/[prefilters|postfilter]/{idFilter}`: Detach the specified filter from the resource. Does not return data.
+  Errors:
+  - `404` if the specified resource does not exists or the specified filter does not belongs to the resource.
+
+
+
+---
+
+
+<!-- #### Provider's Resources
 
 ##### `[GET] /providers/{idProvider}/resources`
 - `[GET] /providers/{idProvider}/resources`: Returns all the resources attached to the provider. See `resources/{idResource}` to see the `resource` entity.
@@ -514,7 +613,7 @@ Providers represents private APIs. For each provider you must specify a `target`
   - `404` if the provider does not exists or the resource does not belongs to the provider.
 
 
----
+--- -->
 
 
 ### Filters
@@ -641,102 +740,3 @@ Consumers can have specific configurations applied on each filter. Next operatio
   ```
 	Errors:
 	- `404` if the specified filter or consumer does not exists.
-
-
----
-
-
-### Resources
-
-> Note, it is allowed to have more than one resource with the same `path` value. Simply remember a resource can only be used with one provider. If two providers can have the same resource you need to create two different resources with the same path and configure with its own filters.
-
-#### `[GET] /resources`
-- `[GET] /resources`: Returns an array with all the configured resources. See `/resources/{idResource}` to see the `resource` entity.
-
-#### `[POST] /resources`
-- `[POST] /resources`: Creates a new resource. Operation expects an object with the required properties:
-  ```json
-  {
-  "path": "/resource_path",
-	"description": "...."
-  }
-  ```
-  Operation returns the new created resource:
-  ```json
-  {
-    "id": "...",
-    "path": "/resource_path",
-		"description": "...."
-  }
-  ```
-
-#### `[GET] /resources/{idResource}`
-- `[GET] /resources/{idResource}`: Returns the specified resource:
-  ```json
-  {
-    "id": "...",
-    "path": "/resource_path",
-		"description": "...."
-  }
-  ```
-  Errors:
-  - `404` if the entity not exists.
-
-#### `[PUT] /resources/{idResource}`
-- `[PUT] /resources/{idResource}`: Updated the resources properties. Operations expects an object with the properties to be updated:
-  ```json
-  {
-  "path": "/resource_path",
-	"description": "...."
-  }
-  ```
-  Operation returns the new created resource:
-  ```json
-  {
-    "id": "...",
-    "path": "/resource_path",
-		"description": "...."
-  }
-  ```
-  Errors:
-  - `404` if the resource does not exists.
-
-#### `[DELETE] /resources/{idResource}`
-- `[DELETE] /resources/{idResource}`: Deletes the specified resource. Operations returns the deleted resource without `id` property:
-  ```json
-  {
-    "path": "/resource_path",
-		"description": "...."
-  }
-  ```
-
-#### Resource's Filters
-
-##### `[GET] /resources/{idResource}/[prefilters|postfilter]`
-- `[GET] /resources/{idResource}/[prefilters|postfilter]`: Returns all the prefilters/postfilters attached with the resource. See `/filters/{idFilter}` to see the filter entity structure.
-
-##### `[GET] /resources/{idResource}/[prefilters|postfilter]/{idFilter}`
-- `[GET] /resources/{idResource}/[prefilters|postfilter]/{idFilter}`: Returns the specified filter attached with the resource:
-  ```json
-  {
-    "id": "...",
-    "name": "filter name",
-		"description": "....",
-    "config": {
-      "param": "value",
-      "...": "..."
-    }
-  }
-  ```
-  Errors:
-  - `404` if the specified resource does not exists or the specified filter does not belongs to the resource.
-
-##### `[POST] /resources/{idResource}/[prefilters|postfilter]/{idFilter}`
-- `[POST] /resources/{idResource}/[prefilters|postfilter]/{idFilter}`: Attach the specified filter to the resource. Does not return data.
-  Errors:
-  - `404` if the specified resource or filter does not exists.
-
-##### `[DELETE] /resources/{idResource}/[prefilters|postfilter]/{idFilter}`
-- `[DELETE] /resources/{idResource}/[prefilters|postfilter]/{idFilter}`: Detach the specified filter from the resource. Does not return data.
-  Errors:
-  - `404` if the specified resource does not exists or the specified filter does not belongs to the resource.
