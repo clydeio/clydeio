@@ -1047,7 +1047,7 @@ describe("routes (memory backend)", function() {
     it("'[PUT] /providers/{idProvider}' fails updating a provier due duplicated 'context' value", function(done) {
       var props = {
         target: "http://differentserver.com",
-        context: "/context",
+        context: "/context"
       };
       request("http://localhost:9999")
         .put("/providers/" + providerId)
@@ -1061,7 +1061,7 @@ describe("routes (memory backend)", function() {
     it("'[PUT] /providers/{idProvider}' success updating a provier", function(done) {
       var props = {
         target: "http://differentserver.com",
-        context: "/differentcontext",
+        context: "/differentcontext"
       };
       request("http://localhost:9999")
         .put("/providers/" + providerId)
@@ -1091,9 +1091,70 @@ describe("routes (memory backend)", function() {
         .end(done);
     });
 
-    describe("delete-resource", function() {
+    describe("delete with resources", function() {
 
-      it.skip("'[DELETE] /providers/{idProvider}' success deleting a provier with resources", function(done) {
+      var resourceId = null;
+
+      before(function(done) {
+        // Create a test provider
+        var props = {
+          target: "http://someserver.com",
+          context: "/context",
+          description: "description for this provider"
+        };
+        request("http://localhost:9999")
+          .post("/providers")
+          .send(props)
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(200)
+          .expect(function(res) {
+            expect(res.body.id).to.be.not.null;
+            expect(res.body.target).to.be.equal(props.target);
+            expect(res.body.context).to.be.equal(props.context);
+            expect(res.body.description).to.be.equal(props.description);
+
+            // Store id
+            providerId = res.body.id;
+          })
+          .end(function() {
+            // Create test resource
+            var propsResource = {
+              path: "/somepath",
+              description: "a test resource"
+            };
+            request("http://localhost:9999")
+              .post("/providers/" + providerId + "/resources")
+              .send(propsResource)
+              .set("Accept", "application/json")
+              .expect("Content-Type", "application/json; charset=utf-8")
+              .expect(200)
+              .expect(function(res) {
+                expect(res.body.id).to.be.not.null;
+                expect(res.body.path).to.be.equal(propsResource.path);
+
+                // Store resource id
+                resourceId = res.body.id;
+              })
+              .end(done);
+          });
+      });
+
+      it("'[DELETE] /providers/{idProvider}' success deleting a provier with resources", function(done) {
+        request("http://localhost:9999")
+          .delete("/providers/" + providerId)
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(200)
+          .end(function() {
+            // Check there is no resource
+            request("http://localhost:9999")
+              .get("/providers/" + providerId + "/resources/" + resourceId)
+              .set("Accept", "application/json")
+              .expect("Content-Type", "application/json; charset=utf-8")
+              .expect(404)
+              .end(done);
+          });
       });
 
     });
@@ -1297,7 +1358,7 @@ describe("routes (memory backend)", function() {
           .end(done);
       });
 
-      it("'[PUT] /providers/{idProvider}/resources' success updating a resource", function(done) {
+      it("'[PUT] /providers/{idProvider}/resources/{idResource}' success updating a resource", function(done) {
         var props = {
           path: "/somenewpath"
         };
@@ -1310,23 +1371,42 @@ describe("routes (memory backend)", function() {
           .end(done);
       });
 
-      it.skip("'[DELETE] /providers/{idProvider}/resources' fails deleting due provider not exists", function(done) {
-
+      it("'[DELETE] /providers/{idProvider}/resources/{idResource}' fails deleting due provider not exists", function(done) {
+        request("http://localhost:9999")
+          .delete("/providers/notexists/resources/notexists")
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(404)
+          .end(done);
       });
 
-      it.skip("'[DELETE] /providers/{idProvider}/resources' fails deleting due resource not exists", function(done) {
-
+      it("'[DELETE] /providers/{idProvider}/resources/{idResource}' fails deleting due resource not exists", function(done) {
+        request("http://localhost:9999")
+          .delete("/providers/" + providerId + "/resources/notexists")
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(404)
+          .end(done);
       });
 
-      it.skip("'[DELETE] /providers/{idProvider}/resources' success deleting a resource", function(done) {
-
+      it("'[DELETE] /providers/{idProvider}/resources/{idResource}' success deleting a resource", function(done) {
+        request("http://localhost:9999")
+          .delete("/providers/" + providerId + "/resources/" + resourceId)
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(200)
+          .end(function() {
+            request("http://localhost:9999")
+              .delete("/providers/" + providerId + "/resources/" + resourceId)
+              .set("Accept", "application/json")
+              .expect("Content-Type", "application/json; charset=utf-8")
+              .expect(404)
+              .end(done);
+          });
       });
-
-
 
     });
 
   });
-
 
 });

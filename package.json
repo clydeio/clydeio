@@ -24,7 +24,7 @@
   "license": "MIT",
   "scripts": {
     "start": "NODE_ENV=development node ./bin/clyde",
-    "lint": "./node_modules/eslint/bin/eslint.js **/*.js",
+    "lint": "./node_modules/eslint/bin/eslint.js .",
     "test": "NODE_ENV=test ./node_modules/mocha/bin/mocha test/**/*.spec.js"
   },
   "engines": {
