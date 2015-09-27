@@ -1223,6 +1223,19 @@ describe("routes (memory backend)", function() {
           .end(done);
       });
 
+      it("'[POST] /providers/{idProvider}/resources' fails creating due path is duplicated", function(done) {
+        var props = {
+          path: "/somepath"
+        };
+        request("http://localhost:9999")
+          .post("/providers/" + providerId + "/resources")
+          .send(props)
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(409)
+          .end(done);
+      });
+
       it("'[GET] /providers/{idProvider}/resources/{idResource}' success returning a resource", function(done) {
         request("http://localhost:9999")
           .get("/providers/" + providerId + "/resources/" + resourceId)
@@ -1232,20 +1245,69 @@ describe("routes (memory backend)", function() {
           .end(done);
       });
 
-      it.skip("'[PUT] /providers/{idProvider}/resources' fails updating due provider do not exists", function(done) {
-
+      it("'[PUT] /providers/{idProvider}/resources/{idResource}' fails updating due provider do not exists", function(done) {
+        var props = {
+          path: "/somepath"
+        };
+        request("http://localhost:9999")
+          .put("/providers/notexists/resources/notexists")
+          .send(props)
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(404)
+          .end(done);
       });
 
-      it.skip("'[PUT] /providers/{idProvider}/resources' fails updating due invalid 'path' value", function(done) {
-
+      it("'[PUT] /providers/{idProvider}/resources/{idResource}' fails updating due resource do not exists", function(done) {
+        var props = {
+          path: "/somepath"
+        };
+        request("http://localhost:9999")
+          .put("/providers/" + providerId + "/resources/notexists")
+          .send(props)
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(404)
+          .end(done);
       });
 
-      it.skip("'[PUT] /providers/{idProvider}/resources' fails updating due invalid 'description' value", function(done) {
-
+      it("'[PUT] /providers/{idProvider}/resources' fails updating due invalid 'path' value", function(done) {
+        var props = {
+          nopath: ""
+        };
+        request("http://localhost:9999")
+          .put("/providers/" + providerId + "/resources/" + resourceId)
+          .send(props)
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(400)
+          .end(done);
       });
 
-      it.skip("'[PUT] /providers/{idProvider}/resources' success updating a resource", function(done) {
+      it("'[PUT] /providers/{idProvider}/resources/{idResource}' fails updating due path is duplicated", function(done) {
+        var props = {
+          path: "/somepath"
+        };
+        request("http://localhost:9999")
+          .put("/providers/" + providerId + "/resources/" + resourceId)
+          .send(props)
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(409)
+          .end(done);
+      });
 
+      it("'[PUT] /providers/{idProvider}/resources' success updating a resource", function(done) {
+        var props = {
+          path: "/somenewpath"
+        };
+        request("http://localhost:9999")
+          .put("/providers/" + providerId + "/resources/" + resourceId)
+          .send(props)
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(200)
+          .end(done);
       });
 
       it.skip("'[DELETE] /providers/{idProvider}/resources' fails deleting due provider not exists", function(done) {
