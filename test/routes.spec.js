@@ -1159,7 +1159,112 @@ describe("routes (memory backend)", function() {
 
     });
 
-    describe("resources", function() {
+    describe("provider filters", function() {
+
+      before(function(done) {
+        // Create a test provider
+        var props = {
+          target: "http://someserver.com",
+          context: "/context",
+          description: "description for this provider"
+        };
+        request("http://localhost:9999")
+          .post("/providers")
+          .send(props)
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(200)
+          .expect(function(res) {
+            expect(res.body.id).to.be.not.null;
+            expect(res.body.target).to.be.equal(props.target);
+            expect(res.body.context).to.be.equal(props.context);
+            expect(res.body.description).to.be.equal(props.description);
+
+            // Store id
+            providerId = res.body.id;
+          })
+          .end(done);
+      });
+
+      after(function(done) {
+        request("http://localhost:9999")
+          .delete("/providers/" + providerId)
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(200)
+          .end(done);
+      });
+
+      it("'[GET] /providers/{idProvider}/prefilters' fails due provider do not exists", function(done) {
+        request("http://localhost:9999")
+          .get("/providers/notexists/prefilters")
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(404)
+          .end(done);
+      });
+
+      it("'[GET] /providers/{idProvider}/prefilters' should return an empty array", function(done) {
+        request("http://localhost:9999")
+          .get("/providers/" + providerId + "/prefilters")
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(200)
+          .expect(function(res) {
+            expect(res.body).to.be.instanceof(Array);
+            expect(res.body).to.be.empty;
+          })
+          .end(done);
+      });
+
+      it.skip("'[GET] /providers/{idProvider}/prefilters/{idFilter}' fails due provider do not exists", function(done) {
+
+      });
+
+      it.skip("'[GET] /providers/{idProvider}/prefilters/{idFilter}' fails due filter do not exists", function(done) {
+
+      });
+
+      it.skip("'[POST] /providers/{idProvider}/prefilters/{idFilter}' fails due provider do not exists", function(done) {
+
+      });
+
+      it.skip("'[POST] /providers/{idProvider}/prefilters/{idFilter}' fails due filter do not exists", function(done) {
+
+      });
+
+      it.skip("'[POST] /providers/{idProvider}/prefilters/{idFilter}' success attaching a filter", function(done) {
+
+      });
+
+      it.skip("'[GET] /providers/{idProvider}/prefilters/{idFilter}' success returning a filter", function(done) {
+
+      });
+
+      it.skip("'[GET] /providers/{idProvider}/prefilters' should return an array with one element", function(done) {
+
+      });
+
+      it.skip("'[DELETE] /providers/{idProvider}/prefilters/{idFilter}' fails due provider do not exists", function(done) {
+
+      });
+
+      it.skip("'[DELETE] /providers/{idProvider}/prefilters/{idFilter}' fails due filter do not exists", function(done) {
+
+      });
+
+      it.skip("'[DELETE] /providers/{idProvider}/prefilters/{idFilter}' success detaching a filter", function(done) {
+
+      });
+
+      it.skip("'[DELETE] /providers/{idProvider}' success deleting provider with filters", function(done) {
+
+      });
+
+    });
+
+
+    describe("provider resources", function() {
 
       var resourceId = null;
 
@@ -1403,6 +1508,14 @@ describe("routes (memory backend)", function() {
               .expect(404)
               .end(done);
           });
+      });
+
+      describe("provider resource filters", function() {
+
+        it.skip("'[GET] /providers/{idProvider}/resources/{idResource}/prefilters' fails due provider do not exists", function(done) {
+
+        });
+
       });
 
     });
