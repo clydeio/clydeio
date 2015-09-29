@@ -1159,6 +1159,109 @@ describe("routes (memory backend)", function() {
 
     });
 
+    describe("delete with filters", function() {
+
+      var filterId = null;
+
+      before(function(done) {
+        // Create a test provider
+        var props = {
+          target: "http://someserver.com",
+          context: "/context",
+          description: "description for this provider"
+        };
+        request("http://localhost:9999")
+          .post("/providers")
+          .send(props)
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(200)
+          .expect(function(res) {
+            expect(res.body.id).to.be.not.null;
+            expect(res.body.target).to.be.equal(props.target);
+            expect(res.body.context).to.be.equal(props.context);
+            expect(res.body.description).to.be.equal(props.description);
+
+            // Store id
+            providerId = res.body.id;
+          })
+          .end(function() {
+            // Create test filter
+            var propsFilter = {
+              module: "other path",
+              name: "other name",
+              description: "some description",
+              config: {
+                param: "value"
+              }
+            };
+            request("http://localhost:9999")
+              .post("/filters")
+              .send(propsFilter)
+              .set("Accept", "application/json")
+              .expect("Content-Type", "application/json; charset=utf-8")
+              .expect(200)
+              .expect(function(res) {
+                expect(res.body.id).to.be.not.null;
+                expect(res.body.module).to.be.equal(propsFilter.module);
+                expect(res.body.name).to.be.equal(propsFilter.name);
+                expect(res.body.description).to.be.equal(propsFilter.description);
+                expect(res.body.config.param).to.be.equal(propsFilter.config.param);
+
+                filterId = res.body.id;
+              })
+              .end(function() {
+                // Attach filter to provier as prefilter
+                request("http://localhost:9999")
+                  .post("/providers/" + providerId + "/prefilters/" + filterId)
+                  .set("Accept", "application/json")
+                  .expect("Content-Type", "application/json; charset=utf-8")
+                  .expect(200)
+                  .expect(function(res) {
+                    expect(res.body.id).to.be.equal(filterId);
+                  })
+                  .end(done);
+              });
+          });
+      });
+
+      after(function(done) {
+        // Remove filter. Provider is deleted within the text
+        request("http://localhost:9999")
+          .delete("/filters/" + filterId)
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(200)
+          .end(function() {
+            // Ensure filter is deleted
+            request("http://localhost:9999")
+              .delete("/filters/" + filterId)
+              .set("Accept", "application/json")
+              .expect("Content-Type", "application/json; charset=utf-8")
+              .expect(404)
+              .end(done);
+          });
+      });
+
+      it("'[DELETE] /providers/{idProvider}' success deleting provider with filters", function(done) {
+        request("http://localhost:9999")
+          .delete("/providers/" + providerId)
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(200)
+          .end(function() {
+            // Check there is no resource
+            request("http://localhost:9999")
+              .get("/providers/" + providerId + "/prefilters/" + filterId)
+              .set("Accept", "application/json")
+              .expect("Content-Type", "application/json; charset=utf-8")
+              .expect(404)
+              .end(done);
+          });
+      });
+
+    });
+
     describe("provider filters", function() {
 
       var filterId = null;
@@ -1364,10 +1467,6 @@ describe("routes (memory backend)", function() {
           .expect("Content-Type", "application/json; charset=utf-8")
           .expect(404)
           .end(done);
-      });
-
-      it.skip("'[DELETE] /providers/{idProvider}' success deleting provider with filters", function(done) {
-
       });
 
     });
