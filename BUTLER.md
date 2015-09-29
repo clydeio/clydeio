@@ -42,17 +42,23 @@ Next UML diagram show a representation of all the involved concepts:
 [FilterConsumer]->1[Consumer]
 ```
 
+## Configuations
+
 Butler can manage many configurations, although only one can be the `active` configuration. Think, if you have ClydeIO working with a given configuration: what happens when you modify it attaching or detaching filters that are not fully configured? Your system will be in an inconsistent state.
 
 Multiple configurations allows us to have a stable configuration, marked as the `active` one, while we can work on a second configuration adding or removing providers, changing properties, configuring filters and consumers, without affecting the production one.
 
-In addition allowing multiple configurations allows to deal with situations where we want to make a subtle change. For example, suppose you want to disable a provider, change the logging mode of a filter to debug it, or disable a consumer temporary.
+In addition, allowing multiple configurations allows to deal with situations where we want to make a subtle change. For example, suppose you want to disable a provider, change the logging mode of a filter to debug it, or disable a consumer temporary.
 
 Finally, multiple configurations allow us to maintain a history of configurations. If desired you can clone a configuration, make some changes and make it the active one. Later you can request the configuration and see the evolution of changes.
 
-A configuration can have attached many prefilters and postfilters. Each time a request arrives to ClydeIO they are executed before and after the request is passed to the appropriate provider.
+A configuration can have attached many prefilters and postfilters. Each time a request arrives to ClydeIO they are executed before and after the request is passed to the appropriate provider. The filters attached to a configuration are called *global filters* because the fact the are executed always.
 
-A configuration contains a set of providers. The providers handle the requests that match the given `context` and are redirected to the specified `target` server. A provider can also have prefilters and postfilters. They executed before and after the request is redirected to the target server.
+## Providers
+
+The goal of a configuration is to contains a set of configured providers. That is the mission of ClydeIO, proxy requests to a given private API.
+
+Each provider represents a private API that works in a given `target` server. They handles the requests that match the given `context` path and are redirected to the specified `target` server. Each time a request match the `context` we say the request enters the *provider's context*. A provider can also have prefilters and postfilters and they are executed before and after the request is redirected to the target server. These filter are called *provider's filters* because are execute always a request enters a *provider's context*.
 
 In some cases, we want to have a fine degree of control about the resources requested by consumers. Suppose we have a private API at `http://privateAPI.com` which allow to list orders resource `http://privateAPI.com/orders` and their users resource `http://privateAPI.com/users`. Suppose we have configured our ClydeIO server to catch all the request that starts with the context `/some_context` (the request would be something like `http://our.clydeio.server/some_context`) and be redirected to the private API at the target server `http://privateAPI.com`. Also we have attached to the provider a prefilter to log all the requested URLs in a log file.
 
@@ -60,7 +66,7 @@ That configuration offers great flexibility but, what if we want to have too dif
 
 To solve this situations and offer a bit more of of flexibility ClydeIO allows to configure resources too. This way, a provider can have many resources, each one with its own `path` and its own prefilters and postfilters.
 
-
+So, we have three levels where to apply filter: globally at the configuration level, for each configured provier and, finally, for each provider's resource.
 
 
 TODO - Talk about filter, consumers and filter-consumers configurations.

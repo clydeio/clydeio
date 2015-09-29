@@ -1351,7 +1351,7 @@ describe("routes (memory backend)", function() {
           .set("Accept", "application/json")
           .expect("Content-Type", "application/json; charset=utf-8")
           .expect(200)
-          .expect(function(res){
+          .expect(function(res) {
             expect(res.body.id).to.be.equal(filterId);
           })
           .end(done);
