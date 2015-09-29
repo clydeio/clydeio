@@ -2,8 +2,8 @@
 
 "use strict";
 
-var repository = require("../lib/butler/memory-repository"),
-    butlerServer = require("../lib/butler/server"),
+var repository = require("../lib/barkley/memory-repository"),
+    butlerServer = require("../lib/barkley/server"),
     expect = require("chai").expect,
     request = require("supertest");
 
