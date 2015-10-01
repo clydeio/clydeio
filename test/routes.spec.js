@@ -1720,8 +1720,189 @@ describe("routes (memory backend)", function() {
 
       describe("provider resource filters", function() {
 
-        it.skip("'[GET] /providers/{idProvider}/resources/{idResource}/prefilters' fails due provider do not exists", function(done) {
+        var resourceId = null;
 
+        before(function(done) {
+          // Create test resource
+          var propsResource = {
+            path: "/somepathsomewhere"
+          };
+          request("http://localhost:9999")
+            .post("/providers/" + providerId + "/resources")
+            .send(propsResource)
+            .set("Accept", "application/json")
+            .expect("Content-Type", "application/json; charset=utf-8")
+            .expect(200)
+            .expect(function(res) {
+              expect(res.body.id).to.be.not.null;
+              expect(res.body.path).to.be.equal(propsResource.path);
+
+              // Store resource id
+              resourceId = res.body.id;
+            })
+            .end(done);
+        });
+
+        after(function(done) {
+          // Remove the test resource
+          request("http://localhost:9999")
+            .delete("/providers/" + providerId + "/resources/" + resourceId)
+            .set("Accept", "application/json")
+            .expect("Content-Type", "application/json; charset=utf-8")
+            .expect(200)
+            .end(done);
+        });
+
+        it("'[GET] /providers/{idProvider}/resources/{idResource}/prefilters' fails due provider do not exists", function(done) {
+          request("http://localhost:9999")
+            .get("/providers/notexists/resources/notexists/prefilters")
+            .set("Accept", "application/json")
+            .expect("Content-Type", "application/json; charset=utf-8")
+            .expect(404)
+            .end(done);
+        });
+
+        it("'[GET] /providers/{idProvider}/resources/{idResource}/prefilters' fails due resource do not exists", function(done) {
+          request("http://localhost:9999")
+            .get("/providers/" + providerId + "/resources/notexists/prefilters")
+            .set("Accept", "application/json")
+            .expect("Content-Type", "application/json; charset=utf-8")
+            .expect(404)
+            .end(done);
+        });
+
+        it("'[GET] /providers/{idProvider}/resources/{idResource}/prefilters' should return an empty array", function(done) {
+          request("http://localhost:9999")
+            .get("/providers/" + providerId + "/resources/" + resourceId + "/prefilters")
+            .set("Accept", "application/json")
+            .expect("Content-Type", "application/json; charset=utf-8")
+            .expect(200)
+            .expect(function(res) {
+              expect(res.body).to.be.instanceof(Array);
+              expect(res.body).to.be.empty;
+            })
+            .end(done);
+        });
+
+        it.skip("'[GET] /providers/{idProvider}/resources/{idResource}/prefilters/{idFilter}' fails due provider do not exists", function(done) {
+          request("http://localhost:9999")
+            .get("/providers/notexists/resources/{idResource}/prefilters/notexists")
+            .set("Accept", "application/json")
+            .expect("Content-Type", "application/json; charset=utf-8")
+            .expect(404)
+            .end(done);
+        });
+
+        it.skip("'[GET] /providers/{idProvider}/resources/{idResource}/prefilters/{idFilter}' fails due filter do not exists", function(done) {
+          request("http://localhost:9999")
+            .get("/providers/" + providerId + "/resources/{idResource}/prefilters/notexists")
+            .set("Accept", "application/json")
+            .expect("Content-Type", "application/json; charset=utf-8")
+            .expect(404)
+            .end(done);
+        });
+
+        it.skip("'[POST] /providers/{idProvider}/resources/{idResource}/prefilters/{idFilter}' fails due provider do not exists", function(done) {
+          request("http://localhost:9999")
+            .post("/providers/notexists/resources/{idResource}/prefilters/notexists")
+            .set("Accept", "application/json")
+            .expect("Content-Type", "application/json; charset=utf-8")
+            .expect(404)
+            .end(done);
+        });
+
+        it.skip("'[POST] /providers/{idProvider}/resources/{idResource}/prefilters/{idFilter}' fails due filter do not exists", function(done) {
+          request("http://localhost:9999")
+            .post("/providers/" + providerId + "/resources/{idResource}/prefilters/notexists")
+            .set("Accept", "application/json")
+            .expect("Content-Type", "application/json; charset=utf-8")
+            .expect(404)
+            .end(done);
+        });
+
+        it.skip("'[POST] /providers/{idProvider}/resources/{idResource}/prefilters/{idFilter}' success attaching a filter", function(done) {
+          request("http://localhost:9999")
+            .post("/providers/" + providerId + "/resources/{idResource}/prefilters/" + filterId)
+            .set("Accept", "application/json")
+            .expect("Content-Type", "application/json; charset=utf-8")
+            .expect(200)
+            .expect(function(res) {
+              expect(res.body.id).to.be.equal(filterId);
+            })
+            .end(done);
+        });
+
+        it.skip("'[POST] /providers/{idProvider}/resources/{idResource}/prefilters/{idFilter}' fails due filter already attached", function(done) {
+          request("http://localhost:9999")
+            .post("/providers/" + providerId + "/resources/{idResource}/prefilters/" + filterId)
+            .set("Accept", "application/json")
+            .expect("Content-Type", "application/json; charset=utf-8")
+            .expect(409)
+            .end(done);
+        });
+
+        it.skip("'[GET] /providers/{idProvider}/resources/{idResource}/prefilters/{idFilter}' success returning a filter", function(done) {
+          request("http://localhost:9999")
+            .get("/providers/" + providerId + "/resources/{idResource}/prefilters/" + filterId)
+            .set("Accept", "application/json")
+            .expect("Content-Type", "application/json; charset=utf-8")
+            .expect(200)
+            .expect(function(res) {
+              expect(res.body.id).to.be.equal(filterId);
+            })
+            .end(done);
+        });
+
+        it.skip("'[GET] /providers/{idProvider}/resources/{idResource}/prefilters' should return an array with one element", function(done) {
+          request("http://localhost:9999")
+            .get("/providers/" + providerId + "/resources/{idResource}/prefilters")
+            .set("Accept", "application/json")
+            .expect("Content-Type", "application/json; charset=utf-8")
+            .expect(200)
+            .expect(function(res) {
+              expect(res.body).to.be.instanceof(Array);
+              expect(res.body).to.have.length(1);
+            })
+            .end(done);
+        });
+
+        it.skip("'[DELETE] /providers/{idProvider}/resources/{idResource}/prefilters/{idFilter}' fails due provider do not exists", function(done) {
+          request("http://localhost:9999")
+            .delete("/providers/notexists/resources/{idResource}/prefilters/notexists")
+            .set("Accept", "application/json")
+            .expect("Content-Type", "application/json; charset=utf-8")
+            .expect(404)
+            .end(done);
+        });
+
+        it.skip("'[DELETE] /providers/{idProvider}/resources/{idResource}/prefilters/{idFilter}' fails due filter do not exists", function(done) {
+          request("http://localhost:9999")
+            .delete("/providers/" + providerId + "/resources/{idResource}/prefilters/notexists")
+            .set("Accept", "application/json")
+            .expect("Content-Type", "application/json; charset=utf-8")
+            .expect(404)
+            .end(done);
+        });
+
+        it.skip("'[DELETE] /providers/{idProvider}/resources/{idResource}/prefilters/{idFilter}' success detaching a filter", function(done) {
+          request("http://localhost:9999")
+            .delete("/providers/" + providerId + "/resources/{idResource}/prefilters/" + filterId)
+            .set("Accept", "application/json")
+            .expect("Content-Type", "application/json; charset=utf-8")
+            .expect(200)
+            .expect(function(res) {
+              expect(res.body.id).to.be.equal(filterId);
+            })
+            .end(done);
+        });
+
+        it.skip("'[DELETE] /providers/{idProvider}/resources/{idResource}/prefilters/{idFilter}' fails detaching a filter due it is not attached", function(done) {
+          request("http://localhost:9999")
+            .delete("/providers/" + providerId + "/resources/{idResource}/prefilters/" + filterId)
+            .set("Accept", "application/json")
+            .expect("Content-Type", "application/json; charset=utf-8")
+            .expect(404)
+            .end(done);
         });
 
       });
