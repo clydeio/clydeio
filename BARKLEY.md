@@ -11,7 +11,7 @@ Bulter must be both:
 - an API server that allows to play with configurations (for an admin user) and
 - a module allows clyde and filter implementations to access and query configuration.
 
-*Idea*: Allow to handle multiple configurations. While creating or updating configuration we leave it in an unstable state. For example, if we desire to have a provder with authentication we require to make two operations, first add the provider and later attach a authentication prefilter. Those the configuration is unstable until we attach the auth filter.
+*Idea*: Allow to handle multiple configurations. While creating or updating configuration we leave it in an unstable state. For example, if we desire to have a provider with authentication we require to make two operations, first add the provider and later attach a authentication prefilter. Those the configuration is unstable until we attach the auth filter.
 
 
 TODO - Review error codes and add 400 error in operations.
