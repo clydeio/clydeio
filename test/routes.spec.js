@@ -1958,7 +1958,9 @@ describe("routes (memory backend)", function() {
 
     });
 
-  })
+  });
+
+
 
   //
   // Configurations
@@ -1968,39 +1970,121 @@ describe("routes (memory backend)", function() {
 
     var configurationId = null;
 
-    it.skip("'[GET] /configurations' returns an empty array", function() {
-
+    it("'[GET] /configurations' returns an empty array", function(done) {
+      request("http://localhost:9999")
+        .get("/configurations")
+        .set("Accept", "application/json")
+        .expect("Content-Type", "application/json; charset=utf-8")
+        .expect(200)
+        .expect(function(res) {
+          expect(res.body).to.be.instanceof(Array);
+          expect(res.body).to.have.length(0);
+        })
+        .end(done);
     });
 
-    it.skip("'[GET] /configurations/{idConfiguration}' fails due configuration not exists", function() {
-
+    it("'[GET] /configurations/{idConfiguration}' fails due configuration not exists", function(done) {
+      request("http://localhost:9999")
+        .get("/configurations/notexists")
+        .set("Accept", "application/json")
+        .expect("Content-Type", "application/json; charset=utf-8")
+        .expect(404)
+        .end(done);
     });
 
-    it.skip("'[POST] /configurations' fails due invalid name property", function() {
-
+    it("'[POST] /configurations' fails due invalid name property", function(done) {
+      var props = {
+        noname: "hi"
+      };
+      request("http://localhost:9999")
+        .post("/configurations")
+        .send(props)
+        .set("Accept", "application/json")
+        .expect("Content-Type", "application/json; charset=utf-8")
+        .expect(400)
+        .end(done);
     });
 
-    it.skip("'[POST] /configurations' success creating a new configuration", function() {
+    it("'[POST] /configurations' success creating a new configuration", function(done) {
+      var props = {
+        name: "config name"
+      };
+      request("http://localhost:9999")
+        .post("/configurations")
+        .send(props)
+        .set("Accept", "application/json")
+        .expect("Content-Type", "application/json; charset=utf-8")
+        .expect(200)
+        .expect(function(res) {
+          expect(res.body.id).to.be.not.null;
+          expect(res.body.name).to.be.equal(props.name);
 
+          // Store configuration ID
+          configurationId = res.body.id;
+        })
+        .end(done);
     });
 
-    it.skip("'[PUT] /configurations/{idConfiguration}' fails due configuration not exists", function() {
-
+    it("'[PUT] /configurations/{idConfiguration}' fails due configuration not exists", function(done) {
+      var props = {
+        name: "updated config name"
+      };
+      request("http://localhost:9999")
+        .put("/configurations/notexists")
+        .send(props)
+        .set("Accept", "application/json")
+        .expect("Content-Type", "application/json; charset=utf-8")
+        .expect(404)
+        .end(done);
     });
 
-    it.skip("'[PUT] /configurations/{idConfiguration}' fails due invalid name", function() {
-
+    it("'[PUT] /configurations/{idConfiguration}' fails due invalid name", function(done) {
+      var props = {
+        noname: "updated config name"
+      };
+      request("http://localhost:9999")
+        .put("/configurations/" + configurationId)
+        .send(props)
+        .set("Accept", "application/json")
+        .expect("Content-Type", "application/json; charset=utf-8")
+        .expect(400)
+        .end(done);
     });
 
-    it.skip("'[PUT] /configurations/{idConfiguration}' success updating", function() {
-
+    it("'[PUT] /configurations/{idConfiguration}' success updating", function(done) {
+      var props = {
+        name: "updated config name"
+      };
+      request("http://localhost:9999")
+        .put("/configurations/" + configurationId)
+        .send(props)
+        .set("Accept", "application/json")
+        .expect("Content-Type", "application/json; charset=utf-8")
+        .expect(200)
+        .expect(function(res) {
+          expect(res.body.id).to.be.not.null;
+          expect(res.body.name).to.be.equal(props.name);
+        })
+        .end(done);
     });
 
-    it.skip("'[DELETE] /configurations/{idConfiguration}' fails due configuration not exists", function() {
-
+    it("'[DELETE] /configurations/{idConfiguration}' fails due configuration not exists", function(done) {
+      request("http://localhost:9999")
+        .delete("/configurations/notexists")
+        .set("Accept", "application/json")
+        .expect("Content-Type", "application/json; charset=utf-8")
+        .expect(404)
+        .end(done);
     });
 
     describe("filters", function() {
+
+      var filterId = null;
+
+      before(function(done) {
+        // Create test filter
+      });
+
 
       it.skip("'[GET] /configurations/{idConfiguration}/filters' returns an empty array", function() {
 
