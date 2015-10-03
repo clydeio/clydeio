@@ -1720,7 +1720,7 @@ describe("routes (memory backend)", function() {
 
       describe("provider resource filters", function() {
 
-        var resourceId = null;
+        var filterId = null;
 
         before(function(done) {
           // Create test resource
@@ -1740,7 +1740,30 @@ describe("routes (memory backend)", function() {
               // Store resource id
               resourceId = res.body.id;
             })
-            .end(done);
+            // .end(done)
+            .end(function() {
+              // Create a test filter
+              var propsFilter = {
+                module: "some filter path",
+                name: "some filter name"
+              };
+              request("http://localhost:9999")
+                .post("/filters")
+                .send(propsFilter)
+                .set("Accept", "application/json")
+                .expect("Content-Type", "application/json; charset=utf-8")
+                .expect(200)
+                .expect(function(res) {
+                  expect(res.body.id).to.be.not.null;
+                  expect(res.body.module).to.be.equal(propsFilter.module);
+                  expect(res.body.name).to.be.equal(propsFilter.name);
+                  expect(res.body.description).to.be.equal(propsFilter.description);
+                  expect(res.body.config).to.be.equal(propsFilter.config);
+
+                  filterId = res.body.id;
+                })
+                .end(done);
+            });
         });
 
         after(function(done) {
@@ -1784,45 +1807,63 @@ describe("routes (memory backend)", function() {
             .end(done);
         });
 
-        it.skip("'[GET] /providers/{idProvider}/resources/{idResource}/prefilters/{idFilter}' fails due provider do not exists", function(done) {
+        it("'[GET] /providers/{idProvider}/resources/{idResource}/prefilters/{idFilter}' fails due provider do not exists", function(done) {
           request("http://localhost:9999")
-            .get("/providers/notexists/resources/{idResource}/prefilters/notexists")
+            .get("/providers/notexists/resources/notexists/prefilters/notexists")
             .set("Accept", "application/json")
             .expect("Content-Type", "application/json; charset=utf-8")
             .expect(404)
             .end(done);
         });
 
-        it.skip("'[GET] /providers/{idProvider}/resources/{idResource}/prefilters/{idFilter}' fails due filter do not exists", function(done) {
+        it("'[GET] /providers/{idProvider}/resources/{idResource}/prefilters/{idFilter}' fails due resource do not exists", function(done) {
           request("http://localhost:9999")
-            .get("/providers/" + providerId + "/resources/{idResource}/prefilters/notexists")
+            .get("/providers/" + providerId + "/resources/notexists/prefilters/notexists")
             .set("Accept", "application/json")
             .expect("Content-Type", "application/json; charset=utf-8")
             .expect(404)
             .end(done);
         });
 
-        it.skip("'[POST] /providers/{idProvider}/resources/{idResource}/prefilters/{idFilter}' fails due provider do not exists", function(done) {
+        it("'[GET] /providers/{idProvider}/resources/{idResource}/prefilters/{idFilter}' fails due filter do not attached", function(done) {
           request("http://localhost:9999")
-            .post("/providers/notexists/resources/{idResource}/prefilters/notexists")
+            .get("/providers/" + providerId + "/resources/" + resourceId + "/prefilters/notexists")
             .set("Accept", "application/json")
             .expect("Content-Type", "application/json; charset=utf-8")
             .expect(404)
             .end(done);
         });
 
-        it.skip("'[POST] /providers/{idProvider}/resources/{idResource}/prefilters/{idFilter}' fails due filter do not exists", function(done) {
+        it("'[POST] /providers/{idProvider}/resources/{idResource}/prefilters/{idFilter}' fails due provider do not exists", function(done) {
           request("http://localhost:9999")
-            .post("/providers/" + providerId + "/resources/{idResource}/prefilters/notexists")
+            .post("/providers/notexists/resources/notexists/prefilters/notexists")
             .set("Accept", "application/json")
             .expect("Content-Type", "application/json; charset=utf-8")
             .expect(404)
             .end(done);
         });
 
-        it.skip("'[POST] /providers/{idProvider}/resources/{idResource}/prefilters/{idFilter}' success attaching a filter", function(done) {
+        it("'[POST] /providers/{idProvider}/resources/{idResource}/prefilters/{idFilter}' fails due resource do not exists", function(done) {
           request("http://localhost:9999")
-            .post("/providers/" + providerId + "/resources/{idResource}/prefilters/" + filterId)
+            .post("/providers/" + providerId + "/resources/notexists/prefilters/notexists")
+            .set("Accept", "application/json")
+            .expect("Content-Type", "application/json; charset=utf-8")
+            .expect(404)
+            .end(done);
+        });
+
+        it("'[POST] /providers/{idProvider}/resources/{idResource}/prefilters/{idFilter}' fails due filter do not exists", function(done) {
+          request("http://localhost:9999")
+            .post("/providers/" + providerId + "/resources/" + resourceId + "/prefilters/notexists")
+            .set("Accept", "application/json")
+            .expect("Content-Type", "application/json; charset=utf-8")
+            .expect(404)
+            .end(done);
+        });
+
+        it("'[POST] /providers/{idProvider}/resources/{idResource}/prefilters/{idFilter}' success attaching a filter", function(done) {
+          request("http://localhost:9999")
+            .post("/providers/" + providerId + "/resources/" + resourceId + "/prefilters/" + filterId)
             .set("Accept", "application/json")
             .expect("Content-Type", "application/json; charset=utf-8")
             .expect(200)
@@ -1832,18 +1873,18 @@ describe("routes (memory backend)", function() {
             .end(done);
         });
 
-        it.skip("'[POST] /providers/{idProvider}/resources/{idResource}/prefilters/{idFilter}' fails due filter already attached", function(done) {
+        it("'[POST] /providers/{idProvider}/resources/{idResource}/prefilters/{idFilter}' fails due filter already attached", function(done) {
           request("http://localhost:9999")
-            .post("/providers/" + providerId + "/resources/{idResource}/prefilters/" + filterId)
+            .post("/providers/" + providerId + "/resources/" + resourceId + "/prefilters/" + filterId)
             .set("Accept", "application/json")
             .expect("Content-Type", "application/json; charset=utf-8")
             .expect(409)
             .end(done);
         });
 
-        it.skip("'[GET] /providers/{idProvider}/resources/{idResource}/prefilters/{idFilter}' success returning a filter", function(done) {
+        it("'[GET] /providers/{idProvider}/resources/{idResource}/prefilters/{idFilter}' success returning a filter", function(done) {
           request("http://localhost:9999")
-            .get("/providers/" + providerId + "/resources/{idResource}/prefilters/" + filterId)
+            .get("/providers/" + providerId + "/resources/" + resourceId + "/prefilters/" + filterId)
             .set("Accept", "application/json")
             .expect("Content-Type", "application/json; charset=utf-8")
             .expect(200)
@@ -1853,9 +1894,9 @@ describe("routes (memory backend)", function() {
             .end(done);
         });
 
-        it.skip("'[GET] /providers/{idProvider}/resources/{idResource}/prefilters' should return an array with one element", function(done) {
+        it("'[GET] /providers/{idProvider}/resources/{idResource}/prefilters' should return an array with one element", function(done) {
           request("http://localhost:9999")
-            .get("/providers/" + providerId + "/resources/{idResource}/prefilters")
+            .get("/providers/" + providerId + "/resources/" + resourceId + "/prefilters")
             .set("Accept", "application/json")
             .expect("Content-Type", "application/json; charset=utf-8")
             .expect(200)
@@ -1866,27 +1907,36 @@ describe("routes (memory backend)", function() {
             .end(done);
         });
 
-        it.skip("'[DELETE] /providers/{idProvider}/resources/{idResource}/prefilters/{idFilter}' fails due provider do not exists", function(done) {
+        it("'[DELETE] /providers/{idProvider}/resources/{idResource}/prefilters/{idFilter}' fails due provider do not exists", function(done) {
           request("http://localhost:9999")
-            .delete("/providers/notexists/resources/{idResource}/prefilters/notexists")
+            .delete("/providers/notexists/resources/notexists/prefilters/notexists")
             .set("Accept", "application/json")
             .expect("Content-Type", "application/json; charset=utf-8")
             .expect(404)
             .end(done);
         });
 
-        it.skip("'[DELETE] /providers/{idProvider}/resources/{idResource}/prefilters/{idFilter}' fails due filter do not exists", function(done) {
+        it("'[DELETE] /providers/{idProvider}/resources/{idResource}/prefilters/{idFilter}' fails due resource do not exists", function(done) {
           request("http://localhost:9999")
-            .delete("/providers/" + providerId + "/resources/{idResource}/prefilters/notexists")
+            .delete("/providers/" + providerId + "/resources/notexists/prefilters/notexists")
             .set("Accept", "application/json")
             .expect("Content-Type", "application/json; charset=utf-8")
             .expect(404)
             .end(done);
         });
 
-        it.skip("'[DELETE] /providers/{idProvider}/resources/{idResource}/prefilters/{idFilter}' success detaching a filter", function(done) {
+        it("'[DELETE] /providers/{idProvider}/resources/{idResource}/prefilters/{idFilter}' fails due filter do not attached", function(done) {
           request("http://localhost:9999")
-            .delete("/providers/" + providerId + "/resources/{idResource}/prefilters/" + filterId)
+            .delete("/providers/" + providerId + "/resources/" + resourceId + "/prefilters/notexists")
+            .set("Accept", "application/json")
+            .expect("Content-Type", "application/json; charset=utf-8")
+            .expect(404)
+            .end(done);
+        });
+
+        it("'[DELETE] /providers/{idProvider}/resources/{idResource}/prefilters/{idFilter}' success detaching a filter", function(done) {
+          request("http://localhost:9999")
+            .delete("/providers/" + providerId + "/resources/" + resourceId + "/prefilters/" + filterId)
             .set("Accept", "application/json")
             .expect("Content-Type", "application/json; charset=utf-8")
             .expect(200)
@@ -1896,7 +1946,7 @@ describe("routes (memory backend)", function() {
             .end(done);
         });
 
-        it.skip("'[DELETE] /providers/{idProvider}/resources/{idResource}/prefilters/{idFilter}' fails detaching a filter due it is not attached", function(done) {
+        it("'[DELETE] /providers/{idProvider}/resources/{idResource}/prefilters/{idFilter}' fails detaching a filter not attached", function(done) {
           request("http://localhost:9999")
             .delete("/providers/" + providerId + "/resources/{idResource}/prefilters/" + filterId)
             .set("Accept", "application/json")
