@@ -1740,7 +1740,6 @@ describe("routes (memory backend)", function() {
               // Store resource id
               resourceId = res.body.id;
             })
-            // .end(done)
             .end(function() {
               // Create a test filter
               var propsFilter = {
@@ -1948,12 +1947,142 @@ describe("routes (memory backend)", function() {
 
         it("'[DELETE] /providers/{idProvider}/resources/{idResource}/prefilters/{idFilter}' fails detaching a filter not attached", function(done) {
           request("http://localhost:9999")
-            .delete("/providers/" + providerId + "/resources/{idResource}/prefilters/" + filterId)
+            .delete("/providers/" + providerId + "/resources/" + resourceId + "/prefilters/" + filterId)
             .set("Accept", "application/json")
             .expect("Content-Type", "application/json; charset=utf-8")
             .expect(404)
             .end(done);
         });
+
+      });
+
+    });
+
+  })
+
+  //
+  // Configurations
+  //
+
+  describe("configurations", function() {
+
+    var configurationId = null;
+
+    it.skip("'[GET] /configurations' returns an empty array", function() {
+
+    });
+
+    it.skip("'[GET] /configurations/{idConfiguration}' fails due configuration not exists", function() {
+
+    });
+
+    it.skip("'[POST] /configurations' fails due invalid name property", function() {
+
+    });
+
+    it.skip("'[POST] /configurations' success creating a new configuration", function() {
+
+    });
+
+    it.skip("'[PUT] /configurations/{idConfiguration}' fails due configuration not exists", function() {
+
+    });
+
+    it.skip("'[PUT] /configurations/{idConfiguration}' fails due invalid name", function() {
+
+    });
+
+    it.skip("'[PUT] /configurations/{idConfiguration}' success updating", function() {
+
+    });
+
+    it.skip("'[DELETE] /configurations/{idConfiguration}' fails due configuration not exists", function() {
+
+    });
+
+    describe("filters", function() {
+
+      it.skip("'[GET] /configurations/{idConfiguration}/filters' returns an empty array", function() {
+
+      });
+
+      it.skip("'[GET] /configurations/{idConfiguration}/filters/{idFilter}' fails due filter not exists", function() {
+
+      });
+
+      it.skip("'[POST] /configurations/{idConfiguration}/filters/{idFilter}' fails due configuration not exists", function() {
+
+      });
+
+      it.skip("'[POST] /configurations/{idConfiguration}/filters/{idFilter}' fails due filter not exists", function() {
+
+      });
+
+      it.skip("'[POST] /configurations/{idConfiguration}/filters/{idFilter}' success attaching a filter", function() {
+
+      });
+
+      it.skip("'[POST] /configurations/{idConfiguration}/filters/{idFilter}' fails due filter already attached", function() {
+
+      });
+
+      it.skip("'[DELETE] /configurations/{idConfiguration}/filters/{idFilter}' fails due configuration not exists", function() {
+
+      });
+
+      it.skip("'[DELETE] /configurations/{idConfiguration}/filters/{idFilter}' fails due filter not exists", function() {
+
+      });
+
+      it.skip("'[DELETE] /configurations/{idConfiguration}/filters/{idFilter}' fails due filter not attached", function() {
+
+      });
+
+      it.skip("'[DELETE] /configurations/{idConfiguration}/filters/{idFilter}' success detaching a filter", function() {
+
+      });
+
+    });
+
+    describe("providers", function() {
+
+      it.skip("'[GET] /configurations/{idConfiguration}/providers' returns an empty array", function() {
+
+      });
+
+      it.skip("'[GET] /configurations/{idConfiguration}/providers/{idProvider}' fails due provider not exists", function() {
+
+      });
+
+      it.skip("'[POST] /configurations/{idConfiguration}/providers/{idProvider}' fails due configuration not exists", function() {
+
+      });
+
+      it.skip("'[POST] /configurations/{idConfiguration}/providers/{idProvider}' fails due provider not exists", function() {
+
+      });
+
+      it.skip("'[POST] /configurations/{idConfiguration}/providers/{idProvider}' success attaching a provider", function() {
+
+      });
+
+      it.skip("'[POST] /configurations/{idConfiguration}/providers/{idProvider}' fails due provider already attached", function() {
+
+      });
+
+      it.skip("'[DELETE] /configurations/{idConfiguration}/providers/{idProvider}' fails due configuration not exists", function() {
+
+      });
+
+      it.skip("'[DELETE] /configurations/{idConfiguration}/providers/{idProvider}' fails due provider not exists", function() {
+
+      });
+
+      it.skip("'[DELETE] /configurations/{idConfiguration}/providers/{idProvider}' fails due provider not attached", function() {
+
+      });
+
+      it.skip("'[DELETE] /configurations/{idConfiguration}/providers/{idProvider}' success detaching a provider", function() {
 
       });
 
