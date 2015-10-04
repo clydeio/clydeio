@@ -2083,55 +2083,184 @@ describe("routes (memory backend)", function() {
 
       before(function(done) {
         // Create test filter
+        var propsFilter = {
+          module: "other path",
+          name: "test filter name",
+          description: "some description",
+          config: {
+            param: "value"
+          }
+        };
+        request("http://localhost:9999")
+          .post("/filters")
+          .send(propsFilter)
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(200)
+          .expect(function(res) {
+            expect(res.body.id).to.be.not.null;
+            expect(res.body.module).to.be.equal(propsFilter.module);
+            expect(res.body.name).to.be.equal(propsFilter.name);
+            expect(res.body.description).to.be.equal(propsFilter.description);
+            expect(res.body.config.param).to.be.equal(propsFilter.config.param);
+
+            filterId = res.body.id;
+          })
+          .end(done);
       });
 
 
-      it.skip("'[GET] /configurations/{idConfiguration}/filters' returns an empty array", function() {
-
+      it("'[GET] /configurations/{idConfiguration}/filters' returns an empty array", function(done) {
+        request("http://localhost:9999")
+          .get("/configurations/" + configurationId + "/prefilters")
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(200)
+          .expect(function(res) {
+            expect(res.body).to.be.instanceof(Array);
+            expect(res.body).to.be.have.length(0);
+          })
+          .end(done);
       });
 
-      it.skip("'[GET] /configurations/{idConfiguration}/filters/{idFilter}' fails due filter not exists", function() {
-
+      it("'[GET] /configurations/{idConfiguration}/filters/{idFilter}' fails due configuration not exists", function(done) {
+        request("http://localhost:9999")
+          .get("/configurations/notexists/prefilters/notexists")
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(404)
+          .end(done);
       });
 
-      it.skip("'[POST] /configurations/{idConfiguration}/filters/{idFilter}' fails due configuration not exists", function() {
-
+      it("'[GET] /configurations/{idConfiguration}/filters/{idFilter}' fails due filter not exists", function(done) {
+        request("http://localhost:9999")
+          .get("/configurations/" + configurationId + "/prefilters/notexists")
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(404)
+          .end(done);
       });
 
-      it.skip("'[POST] /configurations/{idConfiguration}/filters/{idFilter}' fails due filter not exists", function() {
-
+      it("'[POST] /configurations/{idConfiguration}/filters/{idFilter}' fails due configuration not exists", function(done) {
+        request("http://localhost:9999")
+          .post("/configurations/notexists/prefilters/notexists")
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(404)
+          .end(done);
       });
 
-      it.skip("'[POST] /configurations/{idConfiguration}/filters/{idFilter}' success attaching a filter", function() {
-
+      it("'[POST] /configurations/{idConfiguration}/filters/{idFilter}' fails due filter not exists", function(done) {
+        request("http://localhost:9999")
+          .post("/configurations/" + configurationId + "/prefilters/notexists")
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(404)
+          .end(done);
       });
 
-      it.skip("'[POST] /configurations/{idConfiguration}/filters/{idFilter}' fails due filter already attached", function() {
-
+      it("'[POST] /configurations/{idConfiguration}/filters/{idFilter}' success attaching a filter", function(done) {
+        request("http://localhost:9999")
+          .post("/configurations/" + configurationId + "/prefilters/" + filterId)
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(200)
+          .expect(function(res) {
+            expect(res.body.id).to.be.equal(filterId);
+          })
+          .end(done);
       });
 
-      it.skip("'[DELETE] /configurations/{idConfiguration}/filters/{idFilter}' fails due configuration not exists", function() {
-
+      it("'[POST] /configurations/{idConfiguration}/filters/{idFilter}' fails due filter already attached", function(done) {
+        request("http://localhost:9999")
+          .post("/configurations/" + configurationId + "/prefilters/" + filterId)
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(409)
+          .end(done);
       });
 
-      it.skip("'[DELETE] /configurations/{idConfiguration}/filters/{idFilter}' fails due filter not exists", function() {
-
+      it("'[DELETE] /configurations/{idConfiguration}/filters/{idFilter}' fails due configuration not exists", function(done) {
+        request("http://localhost:9999")
+          .delete("/configurations/notexists/prefilters/notexists")
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(404)
+          .end(done);
       });
 
-      it.skip("'[DELETE] /configurations/{idConfiguration}/filters/{idFilter}' fails due filter not attached", function() {
-
+      it("'[DELETE] /configurations/{idConfiguration}/filters/{idFilter}' fails due filter not exists", function(done) {
+        request("http://localhost:9999")
+          .delete("/configurations/" + configurationId + "/prefilters/notexists")
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(404)
+          .end(done);
       });
 
-      it.skip("'[DELETE] /configurations/{idConfiguration}/filters/{idFilter}' success detaching a filter", function() {
+      it("'[DELETE] /configurations/{idConfiguration}/filters/{idFilter}' success detaching a filter", function(done) {
+        request("http://localhost:9999")
+          .delete("/configurations/" + configurationId + "/prefilters/" + filterId)
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(200)
+          .expect(function(res) {
+            expect(res.body.id).to.be.equal(filterId);
+          })
+          .end(done);
+      });
 
+
+      it("'[DELETE] /configurations/{idConfiguration}/filters/{idFilter}' fails due filter not attached", function(done) {
+        request("http://localhost:9999")
+          .delete("/configurations/" + configurationId + "/prefilters/" + filterId)
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(404)
+          .end(done);
       });
 
     });
 
     describe("providers", function() {
 
-      it.skip("'[GET] /configurations/{idConfiguration}/providers' returns an empty array", function() {
+      var providerId = null;
 
+      before(function(done) {
+        var props = {
+          target: "http://someserver.com",
+          context: "/context",
+          description: "description for this provider"
+        };
+        request("http://localhost:9999")
+          .post("/providers")
+          .send(props)
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(200)
+          .expect(function(res) {
+            expect(res.body.id).to.be.not.null;
+            expect(res.body.target).to.be.equal(props.target);
+            expect(res.body.context).to.be.equal(props.context);
+            expect(res.body.description).to.be.equal(props.description);
+
+            // Store id
+            providerId = res.body.id;
+          })
+          .end(done);
+      });
+
+      it("'[GET] /configurations/{idConfiguration}/providers' returns an empty array", function(done) {
+        request("http://localhost:9999")
+          .get("/configurations/" + configurationId + "/providers")
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(200)
+          .expect(function(res) {
+            expect(res.body).to.be.instanceof(Array);
+            expect(res.body).to.have.length(0);
+          })
+          .end(done);
       });
 
       it.skip("'[GET] /configurations/{idConfiguration}/providers/{idProvider}' fails due provider not exists", function() {
