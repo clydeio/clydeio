@@ -2263,40 +2263,100 @@ describe("routes (memory backend)", function() {
           .end(done);
       });
 
-      it.skip("'[GET] /configurations/{idConfiguration}/providers/{idProvider}' fails due provider not exists", function() {
-
+      it("'[GET] /configurations/{idConfiguration}/providers/{idProvider}' fails due configuration not exists", function(done) {
+        request("http://localhost:9999")
+          .get("/configurations/notexists/providers/notexists")
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(404)
+          .end(done);
       });
 
-      it.skip("'[POST] /configurations/{idConfiguration}/providers/{idProvider}' fails due configuration not exists", function() {
-
+      it("'[GET] /configurations/{idConfiguration}/providers/{idProvider}' fails due provider not exists", function(done) {
+        request("http://localhost:9999")
+          .get("/configurations/" + configurationId + "/providers/notexists")
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(404)
+          .end(done);
       });
 
-      it.skip("'[POST] /configurations/{idConfiguration}/providers/{idProvider}' fails due provider not exists", function() {
-
+      it("'[POST] /configurations/{idConfiguration}/providers/{idProvider}' fails due configuration not exists", function(done) {
+        request("http://localhost:9999")
+          .post("/configurations/notexists/providers/notexists")
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(404)
+          .end(done);
       });
 
-      it.skip("'[POST] /configurations/{idConfiguration}/providers/{idProvider}' success attaching a provider", function() {
-
+      it("'[POST] /configurations/{idConfiguration}/providers/{idProvider}' fails due provider not exists", function(done) {
+        request("http://localhost:9999")
+          .post("/configurations/" + configurationId + "/providers/notexists")
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(404)
+          .end(done);
       });
 
-      it.skip("'[POST] /configurations/{idConfiguration}/providers/{idProvider}' fails due provider already attached", function() {
-
+      it("'[POST] /configurations/{idConfiguration}/providers/{idProvider}' success attaching a provider", function(done) {
+        request("http://localhost:9999")
+          .post("/configurations/" + configurationId + "/providers/" + providerId)
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(200)
+          .expect(function(res) {
+            expect(res.body.id).to.be.equal(providerId);
+          })
+          .end(done);
       });
 
-      it.skip("'[DELETE] /configurations/{idConfiguration}/providers/{idProvider}' fails due configuration not exists", function() {
-
+      it("'[POST] /configurations/{idConfiguration}/providers/{idProvider}' fails due provider already attached", function(done) {
+        request("http://localhost:9999")
+          .post("/configurations/" + configurationId + "/providers/" + providerId)
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(409)
+          .end(done);
       });
 
-      it.skip("'[DELETE] /configurations/{idConfiguration}/providers/{idProvider}' fails due provider not exists", function() {
-
+      it("'[DELETE] /configurations/{idConfiguration}/providers/{idProvider}' fails due configuration not exists", function(done) {
+        request("http://localhost:9999")
+          .delete("/configurations/notexists/providers/notexists")
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(404)
+          .end(done);
       });
 
-      it.skip("'[DELETE] /configurations/{idConfiguration}/providers/{idProvider}' fails due provider not attached", function() {
-
+      it("'[DELETE] /configurations/{idConfiguration}/providers/{idProvider}' fails due provider not exists", function(done) {
+        request("http://localhost:9999")
+          .delete("/configurations/" + configurationId + "/providers/notexists")
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(404)
+          .end(done);
       });
 
-      it.skip("'[DELETE] /configurations/{idConfiguration}/providers/{idProvider}' success detaching a provider", function() {
+      it("'[DELETE] /configurations/{idConfiguration}/providers/{idProvider}' success detaching a provider", function(done) {
+        request("http://localhost:9999")
+          .delete("/configurations/" + configurationId + "/providers/" + providerId)
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(200)
+          .expect(function(res) {
+            expect(res.body.id).to.be.equal(providerId);
+          })
+          .end(done);
+      });
 
+      it("'[DELETE] /configurations/{idConfiguration}/providers/{idProvider}' fails due provider not attached", function(done) {
+        request("http://localhost:9999")
+          .delete("/configurations/" + configurationId + "/providers/" + providerId)
+          .set("Accept", "application/json")
+          .expect("Content-Type", "application/json; charset=utf-8")
+          .expect(404)
+          .end(done);
       });
 
     });
