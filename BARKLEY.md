@@ -1,21 +1,25 @@
 > Temporal documentation for the Barkley module
 
-# Clyde Barkley
+Beyond the technology, Clyde is all about configuring providers, filters, consumers, ... so each time a request arrives it know what to do: what conditions check, to what private API redirect, etc.
 
-Barkley is the chief manager for Clyde's configuration.
+Barkley formalizes and defines all the concepts related to Clyde configurations and offers a tool so that filter developers can access configurations in an uniformly way.
 
-The goal is to provide an interface of operations that can be implemented using any kind of backend: file, redis, mongodb, postgresql, ...
+Anyone can make a Barkley implementation, based on redis, mongodb, postgresql, ... while following the same interface (really, the same set of methods) and ensures the defined model is respected.
 
-Bulter must be both:
+Barkley offers two things at a time:
+- an API server (running at port 9999 by default), which offers to administrators a REST API to manage the Clyde configuration.
+- a module, which implements the methods necessary to manage the configuration. This module is used by the previous API and also is passed to every filter so they can access the specific configurations.
 
-- an API server that allows to play with configurations (for an admin user) and
-- a module allows clyde and filter implementations to access and query configuration.
+This way, when Clyde is started two servers are run:
+- The Clyde server (running at port 8080 by default): the main server listening for request and ensuring each one passes the configured rules.
+- Barkley server (running at port 9999 by default): offers an REST API to manage Clyde configurations.
 
-*Idea*: Allow to handle multiple configurations. While creating or updating configuration we leave it in an unstable state. For example, if we desire to have a provider with authentication we require to make two operations, first add the provider and later attach a authentication prefilter. Those the configuration is unstable until we attach the auth filter.
+> Do not confuse the Barkley server, which is the REST API, with the Barkley module that really implements the set of methods to manage the configuration.
 
 
-TODO - Review error codes and add 400 error in operations.
+## Why the Barkley name?
 
+The original name for the configuration manager module was *Butler* but after a nice > [suggestion](https://github.com/clydeio/clydeio/issues/24) from [@brylie](https://github.com/brylie) it was changed to [Barkley](http://modernfamily.wikia.com/wiki/Barkley), the Modern Family butler dog. I start Clyde project thinking on a famous orangutan, so it fair to name the configuration management module like another famous animal.
 
 ## Conceptual model
 
@@ -688,5 +692,5 @@ Returns the concrete configuration for a given consumer or 404 if the entity not
     }
   }
   ```
-	Errors:
-	- `404` if the specified filter or consumer does not exists.
+  Errors:
+  - `404` if the specified filter or consumer does not exists.
